@@ -6,53 +6,274 @@
 <title>沪上阿姨管家 · 在线版</title>
 <meta name="theme-color" content="#1F3A5F"/>
 <style>
-:root{ --bg:#F7F4EF;--card:#fff;--text:#1A1A1A;--muted:#6B7280;--primary:#1F3A5F;--accent:#C8A96A;--danger:#ef4444;--warn:#f59e0b;--radius:14px;--shadow:0 8px 24px rgba(0,0,0,.08);}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-header{position:sticky;top:0;background:#fff;border-bottom:1px solid #e5e7eb;z-index:10}
-.wrap{max-width:980px;margin:0 auto;padding:12px 16px}
-h1{font-size:18px;margin:4px 0}
-.card{background:#fff;border:1px solid #eef2f7;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;margin:12px 0}
-label{display:block;margin:8px 0 6px;font-weight:600}
-input,select,textarea{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff}
-textarea{min-height:90px}
-.row{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
-.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
-@media (max-width:840px){.row{grid-template-columns:1fr}.col-3,.col-4,.col-6,.col-12{grid-column:span 1}}
-.btn{appearance:none;border:0;border-radius:10px;padding:10px 12px;cursor:pointer;font-weight:600}
-.btn-primary{background:var(--primary);color:#fff}.btn-ghost{background:#eef2ff;color:#1e40af}.btn-accent{background:var(--accent);color:#fff}
-.btn-danger{background:var(--danger);color:#fff}.btn-line{background:#fff;border:1px solid #e5e7eb}
-.actions{display:flex;flex-wrap:wrap;gap:8px}
-.list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-@media (max-width:700px){.list{grid-template-columns:1fr}}
-.item{background:#fff;border:1px solid #eef2f7;border-radius:12px;padding:12px;position:relative}
-.item h3{margin:0 0 6px;font-size:16px}
-.meta{color:var(--muted);font-size:12px;margin-bottom:6px}
-.badge{display:inline-block;background:#e0f2fe;color:#075985;border-radius:999px;padding:3px 8px;font-size:12px;margin-right:6px}
-.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#f3f4f6;margin:2px;font-size:12px}
-.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.thumbs img{width:64px;height:64px;border-radius:8px;border:1px solid #e5e7eb;object-fit:cover;cursor:pointer}
-.files{display:flex;flex-direction:column;gap:6px;margin-top:6px}
-.file{display:flex;justify-content:space-between;align-items:center;padding:8px;border:1px dashed #e5e7eb;border-radius:10px;background:#fafafa}
-.right{position:absolute;right:8px;top:8px;display:flex;gap:6px}
-.empty{padding:24px;text-align:center;color:var(--muted)}
-.sec-title{margin-top:8px;font-weight:700;color:#334155}
-.hr{height:1px;background:#eef2f7;margin:10px 0}
-/* 导出长图用的隐藏容器 */
-#printRoot{position:fixed;left:-99999px;top:-99999px;width:800px;background:#fff;padding:20px}
-.print-title{font-weight:800;font-size:22px;margin:0 0 12px}
-.print-row{display:flex;gap:12px;margin:6px 0}
-.print-key{width:120px;color:#334155;font-weight:700}
-.print-val{flex:1}
-.print-photos{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
-.print-photos img{width:220px;height:220px;object-fit:cover;border:1px solid #e5e7eb;border-radius:8px}
-footer{color:#94a3b8;text-align:center;font-size:12px;padding:18px 0}
+:root{
+  --bg:#F7F4EF;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6B7280;
+  --primary:#1F3A5F;
+  --accent:#C8A96A;
+  --danger:#ef4444;
+  --warn:#f59e0b;
+  --radius:14px;
+  --shadow:0 8px 24px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+}
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#fff;
+  border-bottom:1px solid #e5e7eb;
+}
+.wrap{
+  max-width:980px;
+  margin:0 auto;
+  padding:12px 16px;
+}
+h1{
+  margin:4px 0;
+  font-size:18px;
+}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  border:1px solid #e5e7eb;
+  box-shadow:var(--shadow);
+  padding:12px;
+  margin:12px 0;
+}
+label{
+  display:block;
+  margin:8px 0 6px;
+  font-weight:600;
+}
+input,select,textarea{
+  width:100%;
+  padding:9px 10px;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+}
+textarea{min-height:90px;}
+.row{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:10px;
+}
+.col-3{grid-column:span 3;}
+.col-4{grid-column:span 4;}
+.col-6{grid-column:span 6;}
+.col-12{grid-column:span 12;}
+@media(max-width:840px){
+  .row{grid-template-columns:1fr;}
+  .col-3,.col-4,.col-6,.col-12{grid-column:span 1;}
+}
+.btn{
+  appearance:none;
+  border-radius:10px;
+  border:1px solid transparent;
+  padding:9px 11px;
+  cursor:pointer;
+  font-weight:600;
+  font-size:13px;
+}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-ghost{background:#eef2ff;color:#1e40af;border-color:#e5e7eb;}
+.btn-accent{background:var(--accent);color:#fff;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-line{background:#fff;border-color:#e5e7eb;color:#374151;}
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+@media(max-width:700px){
+  .list{grid-template-columns:1fr;}
+}
+.item{
+  position:relative;
+  border-radius:12px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  padding:12px;
+}
+.item h3{
+  margin:0 0 6px;
+  font-size:16px;
+}
+.meta{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.badge{
+  display:inline-block;
+  background:#e0f2fe;
+  color:#075985;
+  border-radius:999px;
+  padding:3px 8px;
+  font-size:12px;
+  margin-right:6px;
+}
+.pill{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#f3f4f6;
+  margin:2px;
+  font-size:12px;
+}
+.sec-title{
+  margin-top:8px;
+  font-weight:700;
+  color:#374151;
+}
+.thumbs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:6px;
+}
+.thumbs img{
+  width:64px;
+  height:64px;
+  object-fit:cover;
+  border-radius:8px;
+  border:1px solid #e5e7eb;
+  cursor:pointer;
+}
+.files{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-top:6px;
+}
+.file{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:7px 9px;
+  border-radius:10px;
+  border:1px dashed #e5e7eb;
+  background:#f9fafb;
+}
+.right{
+  position:absolute;
+  top:8px;
+  right:8px;
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.empty{
+  padding:24px;
+  text-align:center;
+  color:var(--muted);
+}
+.hr{
+  height:1px;
+  background:#e5e7eb;
+  margin:10px 0;
+}
+footer{
+  text-align:center;
+  font-size:12px;
+  color:#9ca3af;
+  padding:18px 0 24px;
+}
+
+/* 导出长图的隐藏容器 */
+#printRoot{
+  position:fixed;
+  left:-99999px;
+  top:-99999px;
+  width:800px;
+  background:#fff;
+  padding:20px;
+}
+.print-title{
+  font-size:22px;
+  font-weight:800;
+  margin:0 0 12px;
+}
+.print-row{
+  display:flex;
+  gap:12px;
+  margin:4px 0;
+}
+.print-key{
+  width:120px;
+  font-weight:700;
+  color:#334155;
+}
+.print-val{flex:1;}
+.print-photos{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:6px;
+}
+.print-photos img{
+  width:220px;
+  height:220px;
+  object-fit:cover;
+  border-radius:8px;
+  border:1px solid #e5e7eb;
+}
+
+/* 文本导入/导出弹窗 */
+#textIODlg{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.35);
+  z-index:9999;
+}
+#textIODlg .panel{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:min(92vw,820px);
+  max-height:88vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  padding:14px;
+}
+#textIOArea{
+  width:100%;
+  min-height:52vh;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  font-family:ui-monospace,Consolas,monospace;
+  font-size:12px;
+  white-space:pre;
+  overflow:auto;
+}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
     <h1>沪上阿姨管家 · 在线版</h1>
-    <div style="color:#6B7280">数据仅存储在您浏览器本地（IndexedDB），支持手机与电脑访问。</div>
+    <div style="color:#6B7280;font-size:13px">
+      数据仅保存在本机浏览器（IndexedDB），支持电脑和手机访问。
+    </div>
   </div>
 </header>
 
@@ -61,35 +282,48 @@ footer{color:#94a3b8;text-align:center;font-size:12px;padding:18px 0}
   <section class="card">
     <h2>录入 / 编辑</h2>
     <div class="row">
-      <div class="col-12"><label>原始资料（可粘贴微信对话）</label><textarea id="raw"></textarea></div>
+      <div class="col-12">
+        <label>原始资料（可粘贴微信聊天记录）</label>
+        <textarea id="raw"></textarea>
+      </div>
     </div>
     <div class="actions" style="margin:6px 0 10px">
       <button id="btnParse" class="btn btn-ghost">从原始资料一键解析</button>
       <button id="btnClearRaw" class="btn btn-line">清空原始资料</button>
     </div>
+
     <div class="row">
       <div class="col-4"><label>姓名</label><input id="name"></div>
       <div class="col-4"><label>年龄</label><input id="age" type="number"></div>
       <div class="col-4"><label>籍贯</label><input id="origin"></div>
+
       <div class="col-4"><label>联系方式</label><input id="phone"></div>
       <div class="col-4"><label>从业年限</label><input id="exp" type="number"></div>
-      <div class="col-4"><label>住家</label>
-        <select id="livein"><option value="">不限制</option><option>是</option><option>否</option></select>
+      <div class="col-4">
+        <label>住家</label>
+        <select id="livein">
+          <option value="">不限制</option>
+          <option>是</option>
+          <option>否</option>
+        </select>
       </div>
+
       <div class="col-4"><label>属相</label><input id="zodiac"></div>
       <div class="col-4"><label>身高(cm)</label><input id="height" type="number"></div>
       <div class="col-4"><label>体重(kg)</label><input id="weight" type="number"></div>
+
       <div class="col-4"><label>学历</label><input id="education"></div>
-      <div class="col-6"><label>可服务城市（逗号分隔）</label><input id="cities"></div>
-      <div class="col-6"><label>期望薪资</label><input id="salary"></div>
+      <div class="col-4"><label>可服务城市（逗号分隔）</label><input id="cities"></div>
+      <div class="col-4"><label>期望薪资</label><input id="salary"></div>
+
       <div class="col-12"><label>技能标签（逗号/顿号分隔）</label><input id="skills"></div>
       <div class="col-12"><label>备注</label><textarea id="notes"></textarea></div>
     </div>
 
-    <!-- 分类上传区 -->
+    <!-- 分类照片 -->
     <div class="hr"></div>
     <div class="row">
-      <div class="col-3"><label>生活照/证件照</label><input id="photos_life" type="file" accept="image/*" multiple></div>
+      <div class="col-3"><label>生活照 / 证件照</label><input id="photos_life" type="file" accept="image/*" multiple></div>
       <div class="col-3"><label>菜品展示</label><input id="photos_dishes" type="file" accept="image/*" multiple></div>
       <div class="col-3"><label>技能证书</label><input id="photos_certs" type="file" accept="image/*" multiple></div>
       <div class="col-3"><label>体检证明</label><input id="photos_medical" type="file" accept="image/*" multiple></div>
@@ -97,7 +331,7 @@ footer{color:#94a3b8;text-align:center;font-size:12px;padding:18px 0}
 
     <!-- 其他附件 -->
     <div class="row" style="margin-top:8px">
-      <div class="col-12"><label>其他附件（PDF/图片/Word等）</label><input id="attachments" type="file" multiple></div>
+      <div class="col-12"><label>其他附件（PDF/Word/图片等）</label><input id="attachments" type="file" multiple></div>
     </div>
 
     <div class="actions" style="margin-top:10px">
@@ -110,11 +344,17 @@ footer{color:#94a3b8;text-align:center;font-size:12px;padding:18px 0}
   <section class="card">
     <h2>筛选 / 搜索</h2>
     <div class="row">
-      <div class="col-4"><label>关键词</label><input id="q"></div>
-      <div class="col-4"><label>住家</label>
-        <select id="f_livein"><option value="">不限</option><option>是</option><option>否</option></select>
+      <div class="col-4"><label>关键词（姓名/籍贯/备注/技能）</label><input id="q"></div>
+      <div class="col-4">
+        <label>住家</label>
+        <select id="f_livein">
+          <option value="">不限</option>
+          <option>是</option>
+          <option>否</option>
+        </select>
       </div>
       <div class="col-4"><label>城市包含</label><input id="f_city"></div>
+
       <div class="col-4"><label>属相</label><input id="f_zodiac"></div>
       <div class="col-4"><label>学历</label><input id="f_education"></div>
       <div class="col-4"><label>身高 ≥</label><input id="f_height_min" type="number"></div>
@@ -123,39 +363,67 @@ footer{color:#94a3b8;text-align:center;font-size:12px;padding:18px 0}
     </div>
     <div class="actions" style="margin-top:6px">
       <button id="btnClearFilters" class="btn btn-line">清空筛选</button>
-      <span class="muted" id="countInfo" style="margin-left:8px"></span>
+      <span id="countInfo" style="color:#6B7280;margin-left:8px"></span>
     </div>
   </section>
 
   <!-- 列表 -->
   <section class="card">
-    <div class="actions" style="justify-content:space-between">
-      <div>
-        <button id="btnExport" class="btn btn-accent">导出JSON</button>
-        <label class="btn btn-line">导入JSON<input id="importer" type="file" accept="application/json" style="display:none"></label>
+    <div class="actions" style="justify-content:space-between;align-items:center">
+      <div class="actions">
+        <button id="btnExportText" class="btn btn-accent">导出为文本</button>
+        <button id="btnImportText" class="btn btn-line">从文本导入</button>
         <button id="btnDemo" class="btn btn-warn">一键示例数据</button>
         <button id="btnWipe" class="btn btn-danger">清空全部</button>
       </div>
-      <div class="muted">双击卡片编辑 · 右上角：复制 / 删除 / 生成长图 / 网页预览</div>
+      <div style="color:#9ca3af;font-size:12px">
+        双击卡片编辑 · 右上角：复制 / 网页预览 / 生成长图 / 删除
+      </div>
     </div>
     <div id="list" class="list"></div>
-    <div id="empty" class="empty" style="display:none">暂无数据</div>
+    <div id="empty" class="empty" style="display:none">暂无数据，请先录入一条阿姨信息。</div>
   </section>
 </main>
 
-<!-- 隐藏导出容器 -->
+<!-- 长图导出隐藏容器 -->
 <div id="printRoot"></div>
 
-<footer>© 沪上阿姨管家 · 本地离线 · GitHub Pages 版</footer>
+<!-- 文本导入/导出弹窗 -->
+<div id="textIODlg">
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div id="textIOTitle" style="font-weight:700">文本导出</div>
+      <button id="textIOClose" class="btn btn-line">关闭</button>
+    </div>
+    <div id="textIOHint" style="color:#6B7280;font-size:12px;margin-bottom:6px">
+      导出：下方已生成 JSON 文本，可复制到备忘录/记事本保存。
+    </div>
+    <textarea id="textIOArea"></textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <button id="textIOCopy" class="btn btn-primary">复制文本</button>
+      <button id="textIOImport" class="btn btn-accent" style="display:none">导入到库</button>
+      <button id="textIOClear" class="btn btn-line">清空文本</button>
+    </div>
+  </div>
+</div>
 
+<footer>© 沪上阿姨管家 · 本地离线 · 在线版</footer>
+
+<!-- 用于长图导出的 html2canvas，仅主站用 -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
 
 <script>
 (function(){
 "use strict";
-const DB='ayi_web_v2_catphotos',STORE='nannies';
-let db=null,CACHE=[],editingId=null;
 
+const DB_NAME='ayi_web_v2_catphotos';
+const STORE='nannies';
+
+let db=null;
+let CACHE=[];
+let editingId=null;
+
+// DOM helpers
 function $(id){return document.getElementById(id);}
 function uuid(){return 'id-'+Math.random().toString(36).slice(2,10)+Date.now().toString(36);}
 function normList(s){return (s||'').replace(/[、；;\n]/g,',').split(',').map(x=>x.trim()).filter(Boolean);}
@@ -163,56 +431,121 @@ function escapeHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 const toArray = (f)=>Array.from(f||[]);
 function fileToDataURL(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(file);});}
 
-// ---- DB ----
-function openDB(){return new Promise((res,rej)=>{if(db)return res(db);const req=indexedDB.open(DB,1);req.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains(STORE)){d.createObjectStore(STORE,{keyPath:'id'});}};req.onsuccess=()=>{db=req.result;res(db);};req.onerror=()=>rej(req.error);});}
-async function getAll(){const d=await openDB();return new Promise((res,rej)=>{const tx=d.transaction(STORE,'readonly');const os=tx.objectStore(STORE);const q=os.getAll();q.onsuccess=()=>res(q.result||[]);q.onerror=()=>rej(q.error);});}
-async function put(rec){const d=await openDB();return new Promise((res,rej)=>{const tx=d.transaction(STORE,'readwrite');tx.objectStore(STORE).put(rec);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
-async function removeById(id){const d=await openDB();return new Promise((res,rej)=>{const tx=d.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
-async function clearAll(){const d=await openDB();return new Promise((res,rej)=>{const tx=d.transaction(STORE,'readwrite');tx.objectStore(STORE).clear();tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
+// IndexedDB
+function openDB(){
+  return new Promise((res,rej)=>{
+    if(db) return res(db);
+    const req=indexedDB.open(DB_NAME,1);
+    req.onupgradeneeded=e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains(STORE)){
+        d.createObjectStore(STORE,{keyPath:'id'});
+      }
+    };
+    req.onsuccess=()=>{db=req.result;res(db);};
+    req.onerror=()=>rej(req.error);
+  });
+}
+async function getAll(){
+  const d=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=d.transaction(STORE,'readonly');
+    const os=tx.objectStore(STORE);
+    const q=os.getAll();
+    q.onsuccess=()=>res(q.result||[]);
+    q.onerror=()=>rej(q.error);
+  });
+}
+async function put(rec){
+  const d=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=d.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).put(rec);
+    tx.oncomplete=()=>res();
+    tx.onerror=()=>rej(tx.error);
+  });
+}
+async function bulkImport(list){
+  const d=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=d.transaction(STORE,'readwrite');
+    const os=tx.objectStore(STORE);
+    list.forEach(r=>{if(r && r.id) os.put(r);});
+    tx.oncomplete=()=>res();
+    tx.onerror=()=>rej(tx.error);
+  });
+}
+async function removeById(id){
+  const d=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=d.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete=()=>res();
+    tx.onerror=()=>rej(tx.error);
+  });
+}
+async function clearAll(){
+  const d=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=d.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).clear();
+    tx.oncomplete=()=>res();
+    tx.onerror=()=>rej(tx.error);
+  });
+}
 
-// ---- 兼容老数据的照片结构 ----
+// 兼容老数据的 photos 结构
 function normalizePhotos(photos){
   if(!photos) return {life:[],dishes:[],certs:[],medical:[]};
-  if(Array.isArray(photos)){ return {life:photos, dishes:[], certs:[], medical:[]}; }
+  if(Array.isArray(photos)) return {life:photos,dishes:[],certs:[],medical:[]};
   return {
-    life: Array.isArray(photos.life)? photos.life: [],
-    dishes: Array.isArray(photos.dishes)? photos.dishes: [],
-    certs: Array.isArray(photos.certs)? photos.certs: [],
-    medical: Array.isArray(photos.medical)? photos.medical: []
+    life: Array.isArray(photos.life)?photos.life:[],
+    dishes: Array.isArray(photos.dishes)?photos.dishes:[],
+    certs: Array.isArray(photos.certs)?photos.certs:[],
+    medical: Array.isArray(photos.medical)?photos.medical:[]
   };
 }
 
-// ---- 解析微信原文 ----
+// 解析原始资料
 function parseRaw(){
-  const t=$('raw').value.trim(); if(!t){alert('请粘贴原始资料'); return;}
-  const get=(keys,f='')=>{for(const k of keys){const m=t.match(new RegExp(k+'[：: ]*([^\\n，,。；;]+)'));if(m)return m[1].trim();}return f;};
-  if(get(['姓名','名字','称呼','阿姨']))$('name').value=get(['姓名','名字','称呼','阿姨']);
-  if(get(['年龄','岁数','岁']))$('age').value=get(['年龄','岁数','岁']).replace(/[^0-9]/g,'');
-  if(get(['籍贯','老家','来自']))$('origin').value=get(['籍贯','老家','来自']);
-  if(get(['电话','微信','手机','联系方式']))$('phone').value=get(['电话','微信','手机','联系方式']);
-  if(get(['从业年限','经验','带娃经验']))$('exp').value=get(['从业年限','经验','带娃经验']).replace(/[^0-9]/g,'');
-  if(get(['住家','是否住家']))$('livein').value=/(否|不住家)/.test(get(['住家','是否住家']))?'否':'是';
-  if(get(['属相','生肖']))$('zodiac').value=get(['属相','生肖']);
-  if(get(['身高']))$('height').value=get(['身高']).replace(/[^0-9]/g,'');
-  if(get(['体重']))$('weight').value=get(['体重']).replace(/[^0-9]/g,'');
-  if(get(['学历','文化程度']))$('education').value=get(['学历','文化程度']);
-  if(get(['城市','可服务城市','区域','工作城市']))$('cities').value=get(['城市','可服务城市','区域','工作城市']);
-  if(get(['薪资','期望薪资','工资']))$('salary').value=get(['薪资','期望薪资','工资']);
-  if(get(['技能','特长','标签','擅长']))$('skills').value=get(['技能','特长','标签','擅长']);
-  if(get(['备注','说明','其他']))$('notes').value=get(['备注','说明','其他']);
+  const t=($('raw').value||'').trim();
+  if(!t){alert('请先粘贴原始资料');return;}
+  const get=(keys,def='')=>{
+    for(const k of keys){
+      const m=t.match(new RegExp(k+'[：: ]*([^\\n，,。；;]+)'));
+      if(m) return m[1].trim();
+    }
+    return def;
+  };
+  const name=get(['姓名','名字','称呼','阿姨']); if(name) $('name').value=name;
+  const age=get(['年龄','岁数','岁']); if(age) $('age').value=age.replace(/[^0-9]/g,'');
+  const origin=get(['籍贯','老家','来自']); if(origin) $('origin').value=origin;
+  const phone=get(['电话','微信','手机','联系方式']); if(phone) $('phone').value=phone;
+  const exp=get(['从业年限','经验','带娃经验']); if(exp) $('exp').value=exp.replace(/[^0-9]/g,'');
+  const live=get(['住家','是否住家']); if(live) $('livein').value=/(否|不住家)/.test(live)?'否':'是';
+  const zodiac=get(['属相','生肖']); if(zodiac) $('zodiac').value=zodiac;
+  const height=get(['身高']); if(height) $('height').value=height.replace(/[^0-9]/g,'');
+  const weight=get(['体重']); if(weight) $('weight').value=weight.replace(/[^0-9]/g,'');
+  const edu=get(['学历','文化程度']); if(edu) $('education').value=edu;
+  const cities=get(['城市','可服务城市','区域','工作城市']); if(cities) $('cities').value=cities;
+  const salary=get(['薪资','期望薪资','工资']); if(salary) $('salary').value=salary;
+  const skills=get(['技能','特长','标签','擅长']); if(skills) $('skills').value=skills;
+  const notes=get(['备注','说明','其他']); if(notes) $('notes').value=notes;
 }
 function clearRaw(){ $('raw').value=''; }
 
-// ---- 收集 & 保存 ----
+// 收集 & 保存
 async function collect(){
-  const pick = async (inputId)=>Promise.all(toArray($(inputId).files).map(async f=>({name:f.name,type:f.type,size:f.size,dataURL:await fileToDataURL(f)})));
+  const pick = async (id)=>Promise.all(toArray($(id).files).map(async f=>({name:f.name,type:f.type,size:f.size,dataURL:await fileToDataURL(f)})));
   const photos = {
     life: await pick('photos_life'),
     dishes: await pick('photos_dishes'),
     certs: await pick('photos_certs'),
     medical: await pick('photos_medical')
   };
-  const atts = await Promise.all(toArray($('attachments').files).map(async f=>({name:f.name,type:f.type,size:f.size,dataURL:await fileToDataURL(f)})));
+  const attachments = await Promise.all(
+    toArray($('attachments').files).map(async f=>({name:f.name,type:f.type,size:f.size,dataURL:await fileToDataURL(f)}))
+  );
   return {
     id: editingId || uuid(),
     name: $('name').value.trim(),
@@ -230,38 +563,68 @@ async function collect(){
     skills: normList($('skills').value),
     notes: $('notes').value.trim(),
     photos,
-    attachments: atts,
+    attachments,
     updatedAt: new Date().toISOString()
   };
 }
-async function save(){ const r=await collect(); await put(r); resetForm(); reload(); }
+async function save(){
+  const rec=await collect();
+  await put(rec);
+  resetForm();
+  await reload();
+}
 function resetForm(){
   editingId=null;
-  ['raw','name','age','origin','phone','exp','cities','salary','skills','notes','zodiac','height','weight','education'].forEach(id=>$(id).value='');
+  ['raw','name','age','origin','phone','exp','zodiac','height','weight','education','cities','salary','skills','notes'].forEach(id=>$(id).value='');
   ['livein','photos_life','photos_dishes','photos_certs','photos_medical','attachments'].forEach(id=>$(id).value='');
   $('btnSave').textContent='保存为新记录';
 }
+function fillForm(rec){
+  $('name').value=rec.name||'';
+  $('age').value=rec.age||'';
+  $('origin').value=rec.origin||'';
+  $('phone').value=rec.phone||'';
+  $('exp').value=rec.exp||'';
+  $('livein').value=rec.livein||'';
+  $('zodiac').value=rec.zodiac||'';
+  $('height').value=rec.height||'';
+  $('weight').value=rec.weight||'';
+  $('education').value=rec.education||'';
+  $('cities').value=(rec.cities||[]).join(', ');
+  $('salary').value=rec.salary||'';
+  $('skills').value=(rec.skills||[]).join('、');
+  $('notes').value=rec.notes||'';
+  ['photos_life','photos_dishes','photos_certs','photos_medical','attachments'].forEach(id=>$(id).value='');
+}
+function edit(id){
+  const r0=CACHE.find(x=>x.id===id); if(!r0) return;
+  const r={...r0, photos:normalizePhotos(r0.photos)};
+  editingId=r.id;
+  fillForm(r);
+  $('btnSave').textContent='保存更改';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
-// ---- 筛选 ----
-function filter(arr){
+// 筛选
+function filterData(arr){
   const q=($('q').value||'').toLowerCase();
   const livein=$('f_livein').value;
   const city=($('f_city').value||'').trim();
-  const zodiac=($('f_zodiac').value||'').trim();
-  const edu=($('f_education').value||'').trim();
+  const fz=($('f_zodiac').value||'').trim();
+  const fe=($('f_education').value||'').trim();
   const hmin=Number($('f_height_min').value)||null;
   const hmax=Number($('f_height_max').value)||null;
   const wmax=Number($('f_weight_max').value)||null;
 
   return arr.filter(rr=>{
-    const r = {...rr, photos: normalizePhotos(rr.photos)};
+    const r={...rr, photos:normalizePhotos(rr.photos)};
     if(livein && r.livein!==livein) return false;
     if(city && !(r.cities||[]).some(c=>c.includes(city))) return false;
-    if(zodiac && (!r.zodiac || !r.zodiac.includes(zodiac))) return false;
-    if(edu && (!r.education || !r.education.includes(edu))) return false;
-    if(hmin && r.height && r.height < hmin) return false;
-    if(hmax && r.height && r.height > hmax) return false;
-    if(wmax && r.weight && r.weight > wmax) return false;
+    if(fz && (!r.zodiac || !r.zodiac.includes(fz))) return false;
+    if(fe && (!r.education || !r.education.includes(fe))) return false;
+    if(hmin && r.height && r.height<hmin) return false;
+    if(hmax && r.height && r.height>hmax) return false;
+    if(wmax && r.weight && r.weight>wmax) return false;
     if(q){
       const blob=[r.name,r.origin,r.phone,r.salary,r.notes,r.zodiac,r.education,(r.skills||[]).join(','),(r.cities||[]).join(',')].join(' ').toLowerCase();
       if(!blob.includes(q)) return false;
@@ -270,262 +633,399 @@ function filter(arr){
   });
 }
 
-// ---- 渲染 ----
+// 渲染列表
 function render(){
-  const data = filter(CACHE);
-  const list = $('list'), empty=$('empty');
-  list.innerHTML=''; $('countInfo').textContent=`当前显示 ${data.length} / 总计 ${CACHE.length} 条`;
+  const data=filterData(CACHE);
+  const list=$('list'),empty=$('empty');
+  list.innerHTML='';
+  $('countInfo').textContent=`当前显示 ${data.length} / 总计 ${CACHE.length} 条`;
   empty.style.display = data.length ? 'none':'block';
 
   data.forEach(rr=>{
-    const r = {...rr, photos: normalizePhotos(rr.photos)};
-    const el=document.createElement('div'); el.className='item';
+    const r={...rr, photos:normalizePhotos(rr.photos)};
+    const el=document.createElement('div');
+    el.className='item';
 
-    const group = (arr)=> (arr||[]).map(p=>`
+    const group=(arr)=> (arr||[]).map(p=>`
       <div style="text-align:center">
         <img src="${p.dataURL}" alt="${escapeHtml(p.name||'')}" onclick="window.open('${p.dataURL}','_blank')">
-        <a href="${p.dataURL}" download="${escapeHtml(p.name||'photo.jpg')}" style="display:block;font-size:12px;color:#1e40af;margin-top:4px;text-decoration:none">下载</a>
+        <a href="${p.dataURL}" download="${escapeHtml(p.name||'photo.jpg')}" style="display:block;font-size:12px;margin-top:4px;color:#1e3a8a;text-decoration:none;">下载</a>
       </div>`).join('');
 
-    const block = (title, arr)=> arr && arr.length ? `<div class="sec-title">${title}</div><div class="thumbs">${group(arr)}</div>` : '';
+    const block=(title,arr)=>arr && arr.length ? `<div class="sec-title">${title}</div><div class="thumbs">${group(arr)}</div>` : '';
 
     const files=(r.attachments||[]).map(a=>{
       const sizeKB=a.size?(Math.round(a.size/1024)+' KB'):'';
-      return `<div class="file"><div>${escapeHtml(a.name||'文件')} <span class="muted">(${escapeHtml(a.type||'file')}${sizeKB?(' · '+sizeKB):''})</span></div><a class="btn btn-line" download="${escapeHtml(a.name||'file')}" href="${a.dataURL}">下载</a></div>`;
+      return `<div class="file"><div>${escapeHtml(a.name||'文件')} <span style="color:#9ca3af;font-size:12px;">(${escapeHtml(a.type||'file')}${sizeKB?(' · '+sizeKB):''})</span></div><a class="btn btn-line" download="${escapeHtml(a.name||'file')}" href="${a.dataURL}">下载</a></div>`;
     }).join('');
 
     el.innerHTML = `
       <div class="right">
         <button class="btn btn-line" data-act="clone">复制</button>
-        <button class="btn btn-line" data-act="preview">网页预览(可点开大图)</button>
+        <button class="btn btn-line" data-act="preview">网页预览</button>
         <button class="btn btn-line" data-act="img">生成长图</button>
         <button class="btn btn-danger" data-act="del">删除</button>
       </div>
       <h3>${escapeHtml(r.name||'未命名')}</h3>
-      <div class="meta">${r.age?(r.age+'岁 · '):''}${escapeHtml(r.origin||'')}
-        ${r.zodiac?(' · 属相：'+escapeHtml(r.zodiac)) : ''} ${r.education?(' · 学历：'+escapeHtml(r.education)) : ''}</div>
-      <div><span class="badge">身高</span> ${r.height||''} cm <span class="badge">体重</span> ${r.weight||''} kg</div>
+      <div class="meta">
+        ${r.age?(r.age+'岁 · '):''}${escapeHtml(r.origin||'')}
+        ${r.zodiac?(' · 属相：'+escapeHtml(r.zodiac)) : ''}
+        ${r.education?(' · 学历：'+escapeHtml(r.education)) : ''}
+      </div>
+      <div><span class="badge">身高</span> ${r.height||''} cm
+           <span class="badge">体重</span> ${r.weight||''} kg</div>
       <div><span class="badge">联系方式</span> ${escapeHtml(r.phone||'')}</div>
       <div><span class="badge">住家</span> ${escapeHtml(r.livein||'')}</div>
-      <div><span class="badge">城市</span> ${(r.cities||[]).map(c=>'<span class="pill">'+escapeHtml(c)+'</span>').join('')}</div>
-      <div><span class="badge">薪资</span> ${escapeHtml(r.salary||'')}</div>
+      <div><span class="badge">服务城市</span> ${(r.cities||[]).map(c=>'<span class="pill">'+escapeHtml(c)+'</span>').join('')}</div>
+      <div><span class="badge">期望薪资</span> ${escapeHtml(r.salary||'')}</div>
       ${(r.skills&&r.skills.length)?('<div>'+r.skills.map(s=>'<span class="pill">'+escapeHtml(s)+'</span>').join('')+'</div>'):''}
-      ${block('生活照/证件照', r.photos.life)}
+      ${block('生活照 / 证件照', r.photos.life)}
       ${block('菜品展示', r.photos.dishes)}
       ${block('技能证书', r.photos.certs)}
       ${block('体检证明', r.photos.medical)}
       ${files?('<div class="hr"></div><div class="files">'+files+'</div>'):''}
-      ${r.notes?('<div class="hr"></div><div class="muted">'+escapeHtml(r.notes)+'</div>'):''}
+      ${r.notes?('<div class="hr"></div><div style="color:#6b7280;">'+escapeHtml(r.notes)+'</div>'):''}
     `;
 
     el.ondblclick = ()=> edit(r.id);
-    el.querySelector('[data-act="clone"]').onclick = ()=> { editingId=null; fillForm(r); $('btnSave').textContent='保存为新记录'; window.scrollTo({top:0,behavior:'smooth'}); };
-    el.querySelector('[data-act="del"]').onclick = async ()=> { if(confirm('确定删除这条记录吗？')){ await removeById(r.id); reload(); } };
-    el.querySelector('[data-act="img"]').onclick = ()=> exportLongImage(r);
-    el.querySelector('[data-act="preview"]').onclick = ()=> exportInteractivePage(r);
+    el.querySelector('[data-act="clone"]').onclick=()=>{
+      editingId=null;
+      fillForm(r);
+      $('btnSave').textContent='保存为新记录';
+      window.scrollTo({top:0,behavior:'smooth'});
+    };
+    el.querySelector('[data-act="preview"]').onclick=()=> exportInteractivePage(r);
+    el.querySelector('[data-act="img"]').onclick=()=> exportLongImage(r);
+    el.querySelector('[data-act="del"]').onclick=async ()=>{
+      if(confirm('确定删除这条记录吗？')){ await removeById(r.id); await reload(); }
+    };
 
     list.appendChild(el);
   });
 }
 
-function fillForm(r){
-  $('name').value=r.name||''; $('age').value=r.age||''; $('origin').value=r.origin||'';
-  $('phone').value=r.phone||''; $('exp').value=r.exp||''; $('livein').value=r.livein||'';
-  $('zodiac').value=r.zodiac||''; $('height').value=r.height||''; $('weight').value=r.weight||'';
-  $('education').value=r.education||'';
-  $('cities').value=(r.cities||[]).join(', ');
-  $('salary').value=r.salary||'';
-  $('skills').value=(r.skills||[]).join('、');
-  $('notes').value=r.notes||'';
-  ['photos_life','photos_dishes','photos_certs','photos_medical','attachments'].forEach(id=>$(id).value='');
+// 重新加载
+async function reload(){
+  CACHE = await getAll();
+  CACHE.sort((a,b)=> new Date(b.updatedAt||0) - new Date(a.updatedAt||0));
+  render();
 }
-function edit(id){
-  const r0=CACHE.find(x=>x.id===id); if(!r0) return;
-  const r={...r0, photos:normalizePhotos(r0.photos)};
-  editingId=r.id; fillForm(r); $('btnSave').textContent='保存更改'; window.scrollTo({top:0,behavior:'smooth'});
-}
-async function reload(){ CACHE=await getAll(); CACHE.sort((a,b)=>new Date(b.updatedAt||0)-new Date(a.updatedAt||0)); render(); }
 
-// ---- 导出长图（高分辨率，自动降级） ----
+// 导出长图（内部使用，高分辨率）
 async function exportLongImage(rec0){
-  const rec = {...rec0, photos: normalizePhotos(rec0.photos)};
-  const root = $('printRoot');
-  root.innerHTML = '';
+  const r={...rec0, photos:normalizePhotos(rec0.photos)};
+  const root=$('printRoot');
+  root.innerHTML='';
 
-  const title=document.createElement('h2'); title.className='print-title';
-  title.textContent = rec.name ? `阿姨档案：${rec.name}` : '阿姨档案';
+  const title=document.createElement('h2');
+  title.className='print-title';
+  title.textContent=r.name ? ('阿姨档案：'+r.name) : '阿姨档案';
   root.appendChild(title);
 
-  const addRow = (k,v)=>{
-    const row=document.createElement('div'); row.className='print-row';
-    row.innerHTML = `<div class="print-key">${escapeHtml(k)}</div><div class="print-val">${escapeHtml(v||'')}</div>`;
+  const addRow=(k,v)=>{
+    const row=document.createElement('div');
+    row.className='print-row';
+    row.innerHTML=`<div class="print-key">${escapeHtml(k)}</div><div class="print-val">${escapeHtml(v||'')}</div>`;
     root.appendChild(row);
   };
+  addRow('姓名', r.name);
+  addRow('年龄', r.age? (r.age+' 岁'):'');
+  addRow('籍贯', r.origin);
+  addRow('联系方式', r.phone);
+  addRow('从业年限', r.exp!==''?(r.exp+' 年'):'');
+  addRow('住家', r.livein);
+  addRow('属相', r.zodiac);
+  addRow('身高', r.height? (r.height+' cm'):'');
+  addRow('体重', r.weight? (r.weight+' kg'):'');
+  addRow('学历', r.education);
+  addRow('可服务城市', (r.cities||[]).join('、'));
+  addRow('期望薪资', r.salary);
+  addRow('技能标签', (r.skills||[]).join('、'));
+  addRow('备注', r.notes);
 
-  addRow('姓名', rec.name);
-  addRow('年龄', rec.age? (rec.age+' 岁'):'');
-  addRow('籍贯', rec.origin);
-  addRow('联系方式', rec.phone);
-  addRow('从业年限', rec.exp!==''? (rec.exp+' 年'):'');
-  addRow('住家', rec.livein);
-  addRow('属相', rec.zodiac);
-  addRow('身高', rec.height? (rec.height+' cm'):'');
-  addRow('体重', rec.weight? (rec.weight+' kg'):'');
-  addRow('学历', rec.education);
-  addRow('可服务城市', (rec.cities||[]).join('、'));
-  addRow('期望薪资', rec.salary);
-  addRow('技能标签', (rec.skills||[]).join('、'));
-  addRow('备注', rec.notes);
-
-  const addPhotos = (title, arr)=>{
+  const addPhotos=(title,arr)=>{
     if(!arr || !arr.length) return;
-    const h3=document.createElement('h3'); h3.textContent=title; root.appendChild(h3);
-    const box=document.createElement('div'); box.className='print-photos';
-    arr.forEach(p=>{ const img=new Image(); img.src=p.dataURL; img.loading='eager'; box.appendChild(img); });
+    const h3=document.createElement('h3');
+    h3.textContent=title;
+    root.appendChild(h3);
+    const box=document.createElement('div');
+    box.className='print-photos';
+    arr.forEach(p=>{
+      const img=new Image();
+      img.src=p.dataURL;
+      img.loading='eager';
+      box.appendChild(img);
+    });
     root.appendChild(box);
   };
-  addPhotos('生活照/证件照', rec.photos.life);
-  addPhotos('菜品展示', rec.photos.dishes);
-  addPhotos('技能证书', rec.photos.certs);
-  addPhotos('体检证明', rec.photos.medical);
+  addPhotos('生活照 / 证件照', r.photos.life);
+  addPhotos('菜品展示', r.photos.dishes);
+  addPhotos('技能证书', r.photos.certs);
+  addPhotos('体检证明', r.photos.medical);
 
-  await new Promise(r=>setTimeout(r,350)); // 等待图片绘制
-
-  // 根据设备自动提高 scale；失败则自动降级
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const scales = isMobile ? [2, 1.5, 1] : [3, 2.5, 2, 1.5, 1];
-  let blob = null, lastErr = null;
-
+  await new Promise(r=>setTimeout(r,350));
+  const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const scales=isMobile?[2,1.5,1]:[3,2.5,2,1.5,1];
+  let blob=null,lastErr=null;
   for(const sc of scales){
     try{
       const canvas = await html2canvas(root,{backgroundColor:'#ffffff',scale:sc,useCORS:true});
-      blob = await new Promise(res=>canvas.toBlob(res, 'image/png'));
+      blob = await new Promise(res=>canvas.toBlob(res,'image/png'));
       if(blob) break;
-    }catch(e){ lastErr = e; }
-    await new Promise(r=>setTimeout(r,100));
+    }catch(e){lastErr=e;}
+    await new Promise(r=>setTimeout(r,80));
   }
-
   if(!blob){
-    alert('生成长图失败：内存不足或图片过大' + (lastErr? ('\n'+lastErr.message):''));
+    alert('生成长图失败：'+(lastErr?lastErr.message:'内存不足'));
     return;
   }
-
-  const url = URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download=`${rec.name||'阿姨'}-档案.png`; a.click();
-  if(navigator.canShare && navigator.canShare({files:[new File([blob],'card.png',{type:blob.type})]})){
-    try{ await navigator.share({files:[new File([blob],'card.png',{type:blob.type})], title:'阿姨档案'}); }catch(e){}
-  }
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`${r.name||'阿姨'}-档案.png`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 
-// ---- 导出可点开大图的网页（新标签打开，含一键下载PNG） ----
+// 客户预览页：居中卡片 + 大图查看（无导出按钮）
 function exportInteractivePage(rec0){
-  const r = {...rec0, photos: normalizePhotos(rec0.photos)};
-  const esc = (s)=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const section = (title, arr)=> (arr && arr.length) ? `
-    <h3>${esc(title)}</h3>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;margin:8px 0">
-      ${arr.map(p=>`<a href="${p.dataURL}" target="_blank" style="display:inline-block"><img src="${p.dataURL}" style="width:200px;height:200px;object-fit:cover;border:1px solid #e5e7eb;border-radius:8px"/></a>`).join('')}
-    </div>` : '';
+  const r={...rec0, photos:normalizePhotos(rec0.photos)};
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  const section=(title,arr)=> (arr && arr.length)?
+    `<h3>${esc(title)}</h3>
+     <div style="display:flex;flex-wrap:wrap;gap:10px;margin:8px 0">
+       ${arr.map(p=>`
+         <a href="#" onclick="return __showPic(${JSON.stringify(p.dataURL)})" style="display:inline-block">
+           <img src="${p.dataURL}" style="width:200px;height:200px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb"/>
+         </a>`).join('')}
+     </div>` : '';
 
   const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>${esc(r.name||'阿姨')} - 档案预览</title>
 <style>
-body{font:14px/1.6 -apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial;margin:0;padding:20px;background:#fff;color:#1A1A1A}
-.wrap{max-width:900px;margin:0 auto}
-h1{margin:0 0 12px} h2{margin:16px 0 8px} h3{margin:14px 0 8px}
-.row{display:flex;gap:10px;margin:6px 0} .key{width:120px;font-weight:700;color:#334155}
-.badge{display:inline-block;background:#e0f2fe;color:#075985;border-radius:999px;padding:3px 8px;margin-right:6px}
-.pills span{display:inline-block;background:#f3f4f6;border-radius:999px;padding:4px 8px;margin:2px}
-.hr{height:1px;background:#e5e7eb;margin:12px 0}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-.btn{padding:8px 12px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer}
-</style></head><body><div class="wrap">
-<h1>${esc(r.name||'阿姨')} - 档案预览</h1>
-<div class="row"><div class="key">年龄</div><div>${r.age? (r.age+' 岁'):''}</div></div>
-<div class="row"><div class="key">籍贯</div><div>${esc(r.origin)}</div></div>
-<div class="row"><div class="key">联系方式</div><div>${esc(r.phone)}</div></div>
-<div class="row"><div class="key">从业年限</div><div>${r.exp!==''? (r.exp+' 年'):''}</div></div>
-<div class="row"><div class="key">住家</div><div>${esc(r.livein)}</div></div>
-<div class="row"><div class="key">属相</div><div>${esc(r.zodiac)}</div></div>
-<div class="row"><div class="key">身高</div><div>${r.height? (r.height+' cm'):''}</div></div>
-<div class="row"><div class="key">体重</div><div>${r.weight? (r.weight+' kg'):''}</div></div>
-<div class="row"><div class="key">学历</div><div>${esc(r.education)}</div></div>
-<div class="row"><div class="key">可服务城市</div><div class="pills">${(r.cities||[]).map(c=>'<span>'+esc(c)+'</span>').join('')}</div></div>
-<div class="row"><div class="key">期望薪资</div><div>${esc(r.salary)}</div></div>
-<div class="row"><div class="key">技能标签</div><div class="pills">${(r.skills||[]).map(s=>'<span>'+esc(s)+'</span>').join('')}</div></div>
-${r.notes?('<div class="hr"></div><div>'+esc(r.notes)+'</div>'):''}
-<div class="hr"></div>
-${section('生活照/证件照', r.photos.life)}
-${section('菜品展示', r.photos.dishes)}
-${section('技能证书', r.photos.certs)}
-${section('体检证明', r.photos.medical)}
-<div class="hr"></div>
-<div class="actions">
-  <button class="btn" onclick="window.print()">打印/另存为PDF</button>
-  <button class="btn" id="dl">下载PNG长图</button>
+body{
+  margin:0;
+  padding:20px 12px;
+  background:#f3f4f6;
+  font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  color:#111827;
+}
+.wrap{
+  max-width:900px;
+  margin:0 auto;
+}
+.card{
+  background:#ffffff;
+  border-radius:12px;
+  border:1px solid #e5e7eb;
+  box-shadow:0 10px 30px rgba(15,23,42,.12);
+  padding:18px 16px 20px;
+}
+h1{margin:0 0 12px;font-size:20px;}
+h3{margin:14px 0 8px;font-size:15px;}
+.row{display:flex;gap:10px;margin:4px 0;}
+.key{width:96px;color:#374151;font-weight:600;}
+.pills span{
+  display:inline-block;
+  padding:4px 8px;
+  background:#f3f4f6;
+  border-radius:999px;
+  margin:2px 4px 2px 0;
+  font-size:12px;
+}
+.hr{height:1px;background:#e5e7eb;margin:12px 0;}
+.footer-note{margin-top:12px;color:#9ca3af;font-size:12px;text-align:right;}
+
+/* 大图查看器 */
+#viewer{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.95);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+#viewer img{
+  max-width:96vw;
+  max-height:92vh;
+  box-shadow:0 0 20px rgba(0,0,0,.5);
+}
+#viewer .close{
+  position:absolute;
+  right:12px;
+  top:12px;
+  background:#fff;
+  border:0;
+  border-radius:999px;
+  padding:6px 12px;
+  font-size:13px;
+  cursor:pointer;
+}
+</style>
+</head><body>
+<div class="wrap">
+  <div class="card">
+    <h1>${esc(r.name||'阿姨')} 档案</h1>
+
+    <div class="row"><div class="key">年龄</div><div>${r.age?(r.age+' 岁'):''}</div></div>
+    <div class="row"><div class="key">籍贯</div><div>${esc(r.origin)}</div></div>
+    <div class="row"><div class="key">联系方式</div><div>${esc(r.phone)}</div></div>
+    <div class="row"><div class="key">从业年限</div><div>${r.exp!==''?(r.exp+' 年'):''}</div></div>
+    <div class="row"><div class="key">住家</div><div>${esc(r.livein)}</div></div>
+    <div class="row"><div class="key">属相</div><div>${esc(r.zodiac)}</div></div>
+    <div class="row"><div class="key">身高</div><div>${r.height?(r.height+' cm'):''}</div></div>
+    <div class="row"><div class="key">体重</div><div>${r.weight?(r.weight+' kg'):''}</div></div>
+    <div class="row"><div class="key">学历</div><div>${esc(r.education)}</div></div>
+    <div class="row"><div class="key">可服务城市</div><div class="pills">${(r.cities||[]).map(c=>'<span>'+esc(c)+'</span>').join('')}</div></div>
+    <div class="row"><div class="key">期望薪资</div><div>${esc(r.salary)}</div></div>
+    <div class="row"><div class="key">技能标签</div><div class="pills">${(r.skills||[]).map(s=>'<span>'+esc(s)+'</span>').join('')}</div></div>
+
+    ${r.notes?('<div class="hr"></div><div>'+esc(r.notes)+'</div>'):''}
+
+    <div class="hr"></div>
+    ${section('生活照 / 证件照', r.photos.life)}
+    ${section('菜品展示', r.photos.dishes)}
+    ${section('技能证书', r.photos.certs)}
+    ${section('体检证明', r.photos.medical)}
+
+    <div class="footer-note">本页面仅供查看，信息由沪上阿姨管家整理。</div>
+  </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"><\/script>
+
+<div id="viewer" onclick="this.style.display='none'">
+  <button class="close" onclick="document.getElementById('viewer').style.display='none';event.stopPropagation()">关闭</button>
+  <img id="viewerImg" src="" alt="预览图" onclick="event.stopPropagation()"/>
+</div>
+
 <script>
-document.getElementById('dl').onclick = async ()=>{
-  const sc = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 2 : 3;
-  const canvas = await html2canvas(document.body, {backgroundColor:'#ffffff', scale: sc});
-  canvas.toBlob(b=>{
-    const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='${esc(r.name||'阿姨')}-档案.png'; a.click(); setTimeout(()=>URL.revokeObjectURL(u),1000);
-  }, 'image/png');
-};
+// 点击缩略图全屏查看图片，避免新窗口 dataURL 黑屏问题
+async function __showPic(dataURL){
+  try{
+    const resp = await fetch(dataURL);
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const img = document.getElementById('viewerImg');
+    img.onload = ()=>{ URL.revokeObjectURL(url); };
+    img.src = url;
+  }catch(e){
+    document.getElementById('viewerImg').src = dataURL;
+  }
+  document.getElementById('viewer').style.display='flex';
+  return false;
+}
 <\/script>
-</div></body></html>`;
+</body></html>`;
 
-  const url = URL.createObjectURL(new Blob([html], {type:'text/html'}));
-  window.open(url, '_blank');
-  setTimeout(()=>URL.revokeObjectURL(url), 60*1000);
+  const url = URL.createObjectURL(new Blob([html],{type:'text/html'}));
+  window.open(url,'_blank');
+  setTimeout(()=>URL.revokeObjectURL(url),60*1000);
 }
 
-
-// 导入/导出/演示/清空
-function exportJSON(){
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([JSON.stringify(CACHE,null,2)],{type:'application/json'}));
-  a.download='ayi-db.json'; a.click();
+// 文本导出 / 导入
+function exportAsText(){
+  const dlg=$('textIODlg');
+  const area=$('textIOArea');
+  $('textIOTitle').textContent='文本导出（JSON）';
+  $('textIOHint').textContent='导出：下方已生成 JSON 文本，可复制到备忘录/记事本保存。';
+  $('textIOCopy').style.display='';
+  $('textIOImport').style.display='none';
+  area.value=JSON.stringify(CACHE,null,2);
+  dlg.style.display='block';
+  area.focus(); area.select();
 }
-async function importJSON(f){
-  if(!f) return; const txt=await f.text();
+function openTextImport(){
+  const dlg=$('textIODlg');
+  const area=$('textIOArea');
+  $('textIOTitle').textContent='从文本导入（粘贴 JSON）';
+  $('textIOHint').textContent='导入：请粘贴通过“导出为文本”保存的 JSON，再点“导入到库”。';
+  $('textIOCopy').style.display='none';
+  $('textIOImport').style.display='';
+  area.value='';
+  dlg.style.display='block';
+  area.focus();
+}
+async function importFromText(){
+  const txt=$('textIOArea').value.trim();
+  if(!txt){alert('请粘贴 JSON 文本');return;}
   try{
     const arr=JSON.parse(txt);
-    if(!Array.isArray(arr)) throw new Error('JSON 须是数组');
-    for(const r0 of arr){ const r={...r0, photos: normalizePhotos(r0.photos)}; await put(r); }
-    reload();
-  }catch(e){ alert('导入失败：'+e.message); }
+    if(!Array.isArray(arr)) throw new Error('JSON 须为数组（[ ... ]）');
+    const normalized=arr.map(r=>({...r,id:r.id||uuid(),photos:normalizePhotos(r.photos)}));
+    await bulkImport(normalized);
+    $('textIODlg').style.display='none';
+    await reload();
+    alert('导入成功：'+normalized.length+' 条记录');
+  }catch(e){
+    alert('导入失败：'+e.message);
+  }
 }
+async function copyTextIO(){
+  const area=$('textIOArea');
+  try{
+    await navigator.clipboard.writeText(area.value);
+    alert('已复制到剪贴板');
+  }catch{
+    area.focus(); area.select();
+    const ok=document.execCommand && document.execCommand('copy');
+    alert(ok?'已复制到剪贴板':'复制失败，请手动全选复制');
+  }
+}
+
+// 示例 & 清空
 async function demo(){
   const now=new Date().toISOString();
   const list=[{
-    id:uuid(),name:'张阿姨',age:46,origin:'江苏徐州',phone:'13812345678',exp:8,livein:'是',zodiac:'牛',
-    height:160,weight:55,education:'高中',cities:['上海','苏州'],salary:'9000-11000/月',
-    skills:['带娃','做饭','早教'],notes:'持育婴师证，擅长营养餐',
+    id:uuid(),name:'张阿姨',age:46,origin:'江苏徐州',phone:'13812345678',exp:8,livein:'是',
+    zodiac:'牛',height:160,weight:55,education:'高中',
+    cities:['上海','苏州'],salary:'9000-11000/月',
+    skills:['带娃','做饭','早教'],notes:'持育婴师证，擅长营养餐，性格温和。',
     photos:{life:[],dishes:[],certs:[],medical:[]},attachments:[],updatedAt:now
   },{
-    id:uuid(),name:'王姐',age:52,origin:'安徽阜阳',phone:'13911112222',exp:10,livein:'否',zodiac:'猴',
-    height:158,weight:60,education:'大专',cities:['杭州'],salary:'7000-9000/月',
-    skills:['做饭','收纳'],notes:'擅长江浙菜，周末可加班',
+    id:uuid(),name:'王姐',age:52,origin:'安徽阜阳',phone:'13911112222',exp:10,livein:'否',
+    zodiac:'猴',height:158,weight:60,education:'大专',
+    cities:['杭州'],salary:'7000-9000/月',
+    skills:['做饭','收纳'],notes:'擅长江浙菜，周末可加班。',
     photos:{life:[],dishes:[],certs:[],medical:[]},attachments:[],updatedAt:now
   }];
-  for(const r of list) await put(r); reload();
+  await bulkImport(list);
+  await reload();
 }
-async function wipe(){ if(confirm('这会清空本地全部数据（不可恢复），确定？')){ await clearAll(); reload(); resetForm(); } }
+async function wipe(){
+  if(!confirm('这会清空本地所有数据（不可恢复），确定？')) return;
+  await clearAll();
+  await reload();
+  resetForm();
+}
 
 // 事件绑定
-$('btnParse').onclick=parseRaw; $('btnClearRaw').onclick=clearRaw;
-$('btnSave').onclick=save; $('btnReset').onclick=resetForm;
-$('btnExport').onclick=exportJSON; $('btnDemo').onclick=demo; $('btnWipe').onclick=wipe;
-$('importer').onchange=e=>importJSON(e.target.files[0]);
-['q','f_city','f_zodiac','f_education','f_height_min','f_height_max','f_weight_max'].forEach(id=>$(id).oninput=render);
-$('f_livein').onchange=render;
-$('btnClearFilters').onclick=()=>{['q','f_city','f_zodiac','f_education','f_height_min','f_height_max','f_weight_max','f_livein'].forEach(id=>$(id).value=''); render();};
+$('btnParse').onclick=parseRaw;
+$('btnClearRaw').onclick=clearRaw;
+$('btnSave').onclick=save;
+$('btnReset').onclick=resetForm;
+$('btnExportText').onclick=exportAsText;
+$('btnImportText').onclick=openTextImport;
+$('btnDemo').onclick=demo;
+$('btnWipe').onclick=wipe;
+$('btnClearFilters').onclick=()=>{
+  ['q','f_city','f_zodiac','f_education','f_height_min','f_height_max','f_weight_max'].forEach(id=>$(id).value='');
+  $('f_livein').value='';
+  render();
+};
 
-// 初始化
+['q','f_city','f_zodiac','f_education','f_height_min','f_height_max','f_weight_max'].forEach(id=>{
+  $(id).oninput=render;
+});
+$('f_livein').onchange=render;
+
+// 文本弹窗按钮
+$('textIOClose').onclick=()=>{$('textIODlg').style.display='none';};
+$('textIOCopy').onclick=copyTextIO;
+$('textIOImport').onclick=importFromText;
+$('textIOClear').onclick=()=>{$('textIOArea').value='';};
+
 reload();
 })();
 </script>
