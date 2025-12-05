@@ -43,8 +43,8 @@ textarea{min-height:90px}
 .print-row{display:flex;gap:12px;margin:6px 0}
 .print-key{width:120px;color:#334155;font-weight:700}
 .print-val{flex:1}
-.print-photos{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.print-photos img{width:160px;height:160px;object-fit:cover;border:1px solid #e5e7eb;border-radius:8px}
+.print-photos{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.print-photos img{width:220px;height:220px;object-fit:cover;border:1px solid #e5e7eb;border-radius:8px}
 footer{color:#94a3b8;text-align:center;font-size:12px;padding:18px 0}
 </style>
 </head>
@@ -136,7 +136,7 @@ footer{color:#94a3b8;text-align:center;font-size:12px;padding:18px 0}
         <button id="btnDemo" class="btn btn-warn">一键示例数据</button>
         <button id="btnWipe" class="btn btn-danger">清空全部</button>
       </div>
-      <div class="muted">双击卡片编辑 · 右上角：复制 / 删除 / 生成长图</div>
+      <div class="muted">双击卡片编辑 · 右上角：复制 / 删除 / 生成长图 / 网页预览</div>
     </div>
     <div id="list" class="list"></div>
     <div id="empty" class="empty" style="display:none">暂无数据</div>
@@ -172,12 +172,8 @@ async function clearAll(){const d=await openDB();return new Promise((res,rej)=>{
 
 // ---- 兼容老数据的照片结构 ----
 function normalizePhotos(photos){
-  // 新结构：{ life:[], dishes:[], certs:[], medical:[] }
   if(!photos) return {life:[],dishes:[],certs:[],medical:[]};
-  if(Array.isArray(photos)){
-    // 老结构：数组 → 全部归到 life
-    return {life:photos, dishes:[], certs:[], medical:[]};
-  }
+  if(Array.isArray(photos)){ return {life:photos, dishes:[], certs:[], medical:[]}; }
   return {
     life: Array.isArray(photos.life)? photos.life: [],
     dishes: Array.isArray(photos.dishes)? photos.dishes: [],
@@ -209,9 +205,7 @@ function clearRaw(){ $('raw').value=''; }
 
 // ---- 收集 & 保存 ----
 async function collect(){
-  const pick = async (inputId)=>{
-    return Promise.all(toArray($(inputId).files).map(async f=>({name:f.name,type:f.type,size:f.size,dataURL:await fileToDataURL(f)})));
-  };
+  const pick = async (inputId)=>Promise.all(toArray($(inputId).files).map(async f=>({name:f.name,type:f.type,size:f.size,dataURL:await fileToDataURL(f)})));
   const photos = {
     life: await pick('photos_life'),
     dishes: await pick('photos_dishes'),
@@ -240,9 +234,7 @@ async function collect(){
     updatedAt: new Date().toISOString()
   };
 }
-async function save(){
-  const r=await collect(); await put(r); resetForm(); reload();
-}
+async function save(){ const r=await collect(); await put(r); resetForm(); reload(); }
 function resetForm(){
   editingId=null;
   ['raw','name','age','origin','phone','exp','cities','salary','skills','notes','zodiac','height','weight','education'].forEach(id=>$(id).value='');
@@ -305,6 +297,7 @@ function render(){
     el.innerHTML = `
       <div class="right">
         <button class="btn btn-line" data-act="clone">复制</button>
+        <button class="btn btn-line" data-act="preview">网页预览(可点开大图)</button>
         <button class="btn btn-line" data-act="img">生成长图</button>
         <button class="btn btn-danger" data-act="del">删除</button>
       </div>
@@ -329,6 +322,7 @@ function render(){
     el.querySelector('[data-act="clone"]').onclick = ()=> { editingId=null; fillForm(r); $('btnSave').textContent='保存为新记录'; window.scrollTo({top:0,behavior:'smooth'}); };
     el.querySelector('[data-act="del"]').onclick = async ()=> { if(confirm('确定删除这条记录吗？')){ await removeById(r.id); reload(); } };
     el.querySelector('[data-act="img"]').onclick = ()=> exportLongImage(r);
+    el.querySelector('[data-act="preview"]').onclick = ()=> exportInteractivePage(r);
 
     list.appendChild(el);
   });
@@ -352,7 +346,7 @@ function edit(id){
 }
 async function reload(){ CACHE=await getAll(); CACHE.sort((a,b)=>new Date(b.updatedAt||0)-new Date(a.updatedAt||0)); render(); }
 
-// ---- 导出长图（分分类渲染） ----
+// ---- 导出长图（高分辨率，自动降级） ----
 async function exportLongImage(rec0){
   const rec = {...rec0, photos: normalizePhotos(rec0.photos)};
   const root = $('printRoot');
@@ -395,18 +389,98 @@ async function exportLongImage(rec0){
   addPhotos('技能证书', rec.photos.certs);
   addPhotos('体检证明', rec.photos.medical);
 
-  // 等待图片绘制
-  await new Promise(r=>setTimeout(r,300));
-  const dpr=Math.min(window.devicePixelRatio||1,2);
-  const canvas=await html2canvas(root,{backgroundColor:'#ffffff',scale:dpr,useCORS:true});
-  canvas.toBlob(async (blob)=>{
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download=`${rec.name||'阿姨'}-档案.png`; a.click();
-    if(navigator.canShare && navigator.canShare({files:[new File([blob],'card.png',{type:blob.type})]})){
-      try{ await navigator.share({files:[new File([blob],'card.png',{type:blob.type})], title:'阿姨档案'}); }catch(e){}
-    }
-    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  await new Promise(r=>setTimeout(r,350)); // 等待图片绘制
+
+  // 根据设备自动提高 scale；失败则自动降级
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const scales = isMobile ? [2, 1.5, 1] : [3, 2.5, 2, 1.5, 1];
+  let blob = null, lastErr = null;
+
+  for(const sc of scales){
+    try{
+      const canvas = await html2canvas(root,{backgroundColor:'#ffffff',scale:sc,useCORS:true});
+      blob = await new Promise(res=>canvas.toBlob(res, 'image/png'));
+      if(blob) break;
+    }catch(e){ lastErr = e; }
+    await new Promise(r=>setTimeout(r,100));
+  }
+
+  if(!blob){
+    alert('生成长图失败：内存不足或图片过大' + (lastErr? ('\n'+lastErr.message):''));
+    return;
+  }
+
+  const url = URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`${rec.name||'阿姨'}-档案.png`; a.click();
+  if(navigator.canShare && navigator.canShare({files:[new File([blob],'card.png',{type:blob.type})]})){
+    try{ await navigator.share({files:[new File([blob],'card.png',{type:blob.type})], title:'阿姨档案'}); }catch(e){}
+  }
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+
+// ---- 导出可点开大图的网页（新标签打开，含一键下载PNG） ----
+function exportInteractivePage(rec0){
+  const r = {...rec0, photos: normalizePhotos(rec0.photos)};
+  const esc = (s)=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const section = (title, arr)=> (arr && arr.length) ? `
+    <h3>${esc(title)}</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin:8px 0">
+      ${arr.map(p=>`<a href="${p.dataURL}" target="_blank" style="display:inline-block"><img src="${p.dataURL}" style="width:200px;height:200px;object-fit:cover;border:1px solid #e5e7eb;border-radius:8px"/></a>`).join('')}
+    </div>` : '';
+
+  const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>${esc(r.name||'阿姨')} - 档案预览</title>
+<style>
+body{font:14px/1.6 -apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial;margin:0;padding:20px;background:#fff;color:#1A1A1A}
+.wrap{max-width:900px;margin:0 auto}
+h1{margin:0 0 12px} h2{margin:16px 0 8px} h3{margin:14px 0 8px}
+.row{display:flex;gap:10px;margin:6px 0} .key{width:120px;font-weight:700;color:#334155}
+.badge{display:inline-block;background:#e0f2fe;color:#075985;border-radius:999px;padding:3px 8px;margin-right:6px}
+.pills span{display:inline-block;background:#f3f4f6;border-radius:999px;padding:4px 8px;margin:2px}
+.hr{height:1px;background:#e5e7eb;margin:12px 0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.btn{padding:8px 12px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer}
+</style></head><body><div class="wrap">
+<h1>${esc(r.name||'阿姨')} - 档案预览</h1>
+<div class="row"><div class="key">年龄</div><div>${r.age? (r.age+' 岁'):''}</div></div>
+<div class="row"><div class="key">籍贯</div><div>${esc(r.origin)}</div></div>
+<div class="row"><div class="key">联系方式</div><div>${esc(r.phone)}</div></div>
+<div class="row"><div class="key">从业年限</div><div>${r.exp!==''? (r.exp+' 年'):''}</div></div>
+<div class="row"><div class="key">住家</div><div>${esc(r.livein)}</div></div>
+<div class="row"><div class="key">属相</div><div>${esc(r.zodiac)}</div></div>
+<div class="row"><div class="key">身高</div><div>${r.height? (r.height+' cm'):''}</div></div>
+<div class="row"><div class="key">体重</div><div>${r.weight? (r.weight+' kg'):''}</div></div>
+<div class="row"><div class="key">学历</div><div>${esc(r.education)}</div></div>
+<div class="row"><div class="key">可服务城市</div><div class="pills">${(r.cities||[]).map(c=>'<span>'+esc(c)+'</span>').join('')}</div></div>
+<div class="row"><div class="key">期望薪资</div><div>${esc(r.salary)}</div></div>
+<div class="row"><div class="key">技能标签</div><div class="pills">${(r.skills||[]).map(s=>'<span>'+esc(s)+'</span>').join('')}</div></div>
+${r.notes?('<div class="hr"></div><div>'+esc(r.notes)+'</div>'):''}
+<div class="hr"></div>
+${section('生活照/证件照', r.photos.life)}
+${section('菜品展示', r.photos.dishes)}
+${section('技能证书', r.photos.certs)}
+${section('体检证明', r.photos.medical)}
+<div class="hr"></div>
+<div class="actions">
+  <button class="btn" onclick="window.print()">打印/另存为PDF</button>
+  <button class="btn" id="dl">下载PNG长图</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+document.getElementById('dl').onclick = async ()=>{
+  const sc = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 2 : 3;
+  const canvas = await html2canvas(document.body, {backgroundColor:'#ffffff', scale: sc});
+  canvas.toBlob(b=>{
+    const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='${esc(r.name||'阿姨')}-档案.png'; a.click(); setTimeout(()=>URL.revokeObjectURL(u),1000);
   }, 'image/png');
+};
+</script>
+</div></body></html>`;
+
+  const url = URL.createObjectURL(new Blob([html], {type:'text/html'}));
+  window.open(url, '_blank');
+  setTimeout(()=>URL.revokeObjectURL(url), 60*1000);
 }
 
 // 导入/导出/演示/清空
@@ -420,11 +494,7 @@ async function importJSON(f){
   try{
     const arr=JSON.parse(txt);
     if(!Array.isArray(arr)) throw new Error('JSON 须是数组');
-    // 导入时也做一次兼容转换
-    for(const r0 of arr){
-      const r={...r0, photos: normalizePhotos(r0.photos)};
-      await put(r);
-    }
+    for(const r0 of arr){ const r={...r0, photos: normalizePhotos(r0.photos)}; await put(r); }
     reload();
   }catch(e){ alert('导入失败：'+e.message); }
 }
