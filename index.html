@@ -489,45 +489,66 @@ ${pic("体检证明",r.photos.medical)}
 function buildImageHTMLFromRecord(r){
   const p = normalizePhotos(r.photos);
 
-  const sec = (title, arr) => arr && arr.length ? `
-    <h2 style="margin:22px 0 12px;font-size:18px;font-weight:600;">${title}</h2>
-    ${arr.map(img => `
+  const sec = (title, arr) =>
+    arr && arr.length
+      ? `
+    <h2 style="
+      margin:30px 0 16px;
+      font-size:26px;
+      font-weight:650;
+    ">${title}</h2>
+    ${arr
+      .map(
+        (img) => `
       <img src="${img.dataURL}"
-           style="width:100%;border-radius:12px;margin:10px 0 14px;border:1px solid #ddd;">
-    `).join("")}
-  ` : "";
+           style="width:100%;border-radius:16px;margin:16px 0;border:1px solid #ddd;">
+    `
+      )
+      .join("")}
+  `
+      : "";
+
+  // 字段仅当有内容时显示
+  const row = (label, value) => {
+    if (!value || value === "" || (Array.isArray(value) && value.length === 0)) return "";
+    return `<p style="margin:8px 0;font-size:22px;"><b>${label}：</b>${value}</p>`;
+  };
 
   return `
 <div style="
   max-width:900px;
   margin:0 auto;
   background:#ffffff;
-  padding:22px 22px 26px;
-  border-radius:12px;
+  padding:30px 30px 36px;
+  border-radius:16px;
   border:1px solid #e5e7eb;
-  font:16px/1.7 -apple-system,Segoe UI,Roboto;
+  font:22px/1.8 -apple-system,Segoe UI,Roboto;
   color:#111827;
 ">
-  <h2 style="margin:0 0 14px 0;font-size:22px;font-weight:700;">
+  <h1 style="
+    margin:0 0 22px 0;
+    font-size:30px;
+    font-weight:750;
+  ">
     ${esc(r.name)} 档案
-  </h2>
+  </h1>
 
-  <p style="margin:4px 0;">年龄：${r.age || ""} 岁</p>
-  <p style="margin:4px 0;">籍贯：${esc(r.origin)}</p>
-  <p style="margin:4px 0;">属相：${esc(r.zodiac)}</p>
-  <p style="margin:4px 0;">身高：${r.height || ""} cm</p>
-  <p style="margin:4px 0;">体重：${r.weight || ""} kg</p>
-  <p style="margin:4px 0;">学历：${esc(r.education)}</p>
-  <p style="margin:4px 0;">住家：${esc(r.livein)}</p>
-  <p style="margin:4px 0;">电话：${esc(r.phone)}</p>
-  <p style="margin:4px 0;">城市：${(r.cities || []).join("，")}</p>
-  <p style="margin:4px 0;">技能：${(r.skills || []).join("，")}</p>
-  <p style="margin:4px 0;">薪资：${esc(r.salary)}</p>
+  ${row("年龄", r.age ? r.age + " 岁" : "")}
+  ${row("籍贯", esc(r.origin))}
+  ${row("属相", esc(r.zodiac))}
+  ${row("身高", r.height ? r.height + " cm" : "")}
+  ${row("体重", r.weight ? r.weight + " kg" : "")}
+  ${row("学历", esc(r.education))}
+  ${row("住家", esc(r.livein))}
+  ${row("电话", esc(r.phone))}
+  ${row("城市", (r.cities || []).join("，"))}
+  ${row("技能", (r.skills || []).join("，"))}
+  ${row("薪资", esc(r.salary))}
 
   ${
     r.notes
-      ? `<h2 style="margin:20px 0 10px;font-size:18px;font-weight:600;">备注</h2>
-         <p style="margin:4px 0;">${esc(r.notes)}</p>`
+      ? `<h2 style="margin:28px 0 14px;font-size:26px;font-weight:650;">备注</h2>
+         <p style="margin:8px 0;font-size:22px;">${esc(r.notes)}</p>`
       : ""
   }
 
@@ -538,6 +559,7 @@ function buildImageHTMLFromRecord(r){
 </div>
 `;
 }
+
 
 
 // 判断是否手机设备
