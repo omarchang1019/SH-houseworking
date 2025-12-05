@@ -498,18 +498,11 @@ function editRecord(id){
 }
 
 //----------------------------------------------------
-//       ⭐ 客户预览：导出独立 HTML 文件
+//  ⭐ 客户预览：直接在新标签页打开，不下载文件
 //----------------------------------------------------
-function normalizePhotos(p){
-  return {
-    life:p.life||[], dishes:p.dishes||[],
-    certs:p.certs||[], medical:p.medical||[]
-  };
-}
-
 function exportHTML(rec){
-  const r={...rec,photos:normalizePhotos(rec.photos)};
-  const escHtml = s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+  const r = {...rec, photos: normalizePhotos(rec.photos)};
+  const escHtml = s => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");
 
   const picSection = (title, arr)=> arr.length ? `
     <h3>${title}</h3>
@@ -543,12 +536,16 @@ body{font:14px/1.6 -apple-system,Segoe UI,Roboto;padding:16px;background:#f3f4f6
 <div class="row"><div class="key">体重</div><div>${r.weight||""} kg</div></div>
 <div class="row"><div class="key">学历</div><div>${escHtml(r.education)}</div></div>
 <div class="row"><div class="key">住家</div><div>${escHtml(r.livein)}</div></div>
+<div class="row"><div class="key">电话</div><div>${escHtml(r.phone)}</div></div>
+
 <div class="row"><div class="key">城市</div>
   <div>${(r.cities||[]).map(c=>`<span class="pill">${escHtml(c)}</span>`).join("")}</div>
 </div>
+
 <div class="row"><div class="key">技能</div>
   <div>${(r.skills||[]).map(s=>`<span class="pill">${escHtml(s)}</span>`).join("")}</div>
 </div>
+
 <div class="row"><div class="key">薪资</div><div>${escHtml(r.salary)}</div></div>
 
 ${r.notes? `<h3>备注</h3><div>${escHtml(r.notes)}</div>`:""}
@@ -560,44 +557,41 @@ ${picSection("体检证明", r.photos.medical)}
 
 </div></body></html>`;
 
-  const blob=new Blob([html],{type:"text/html"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;
-  a.download=`${r.name}_档案预览.html`;
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),5000);
+  // ⭐ 不下载 → 直接打开新标签页
+  const win = window.open("", "_blank");
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
 }
 
 //----------------------------------------------------
-//  ⭐ 一键导出高清长图（PNG）— html2canvas
+//  ⭐ 一键导出高清长图（PNG）— 稳定版，防闪退
 //----------------------------------------------------
 async function exportPNG(rec){
-  // 生成临时 DOM 容器
+  // 临时容器（隐藏）
   const box=document.createElement("div");
   box.style.position="fixed";
-  box.style.left="-20000px"; // 隐藏
+  box.style.left="-20000px";
   box.style.top="0";
-  box.style.width="900px";
+  box.style.width="760px";   // 原900px改成更安全的760
   box.style.padding="20px";
   box.style.background="#fff";
   document.body.appendChild(box);
 
-  // 写入内容（高度无限制）
   box.innerHTML = buildLongImageHTML(rec);
 
-  // ⭐ 生成高清图：scale=3
+  // ⭐ 降低 scale（从3 → 1.5）防止生成超大图片闪退
   const canvas = await html2canvas(box,{
-    scale:3,
-    useCORS:true,
-    allowTaint:true
+    scale: 1.5,
+    useCORS: true,
+    allowTaint: true,
+    windowWidth: 760
   });
 
-  // 下载
-  const url=canvas.toDataURL("image/png");
-  const a=document.createElement("a");
-  a.href=url;
-  a.download=`${rec.name}_档案长图.png`;
+  const url = canvas.toDataURL("image/png");
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${rec.name}_档案长图.png`;
   a.click();
 
   box.remove();
