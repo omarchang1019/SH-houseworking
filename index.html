@@ -466,7 +466,7 @@ ${section('体检证明', r.photos.medical)}
   <button class="btn" onclick="window.print()">打印/另存为PDF</button>
   <button class="btn" id="dl">下载PNG长图</button>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"><\/script>
 <script>
 document.getElementById('dl').onclick = async ()=>{
   const sc = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 2 : 3;
@@ -475,13 +475,14 @@ document.getElementById('dl').onclick = async ()=>{
     const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='${esc(r.name||'阿姨')}-档案.png'; a.click(); setTimeout(()=>URL.revokeObjectURL(u),1000);
   }, 'image/png');
 };
-</script>
+<\/script>
 </div></body></html>`;
 
   const url = URL.createObjectURL(new Blob([html], {type:'text/html'}));
   window.open(url, '_blank');
   setTimeout(()=>URL.revokeObjectURL(url), 60*1000);
 }
+
 
 // 导入/导出/演示/清空
 function exportJSON(){
