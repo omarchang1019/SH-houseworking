@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>沪上阿姨管家</title>
+<title>沪上阿姨管家（在线版 + 长图）</title>
 
 <!-- 用于生成长图 PNG -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -73,14 +73,6 @@ input,select,textarea{
   display:flex;gap:6px;
 }
 .meta{font-size:12px;color:#6b7280;margin-bottom:6px;}
-.badge{
-  font-size:12px;padding:4px 6px;background:#eef2ff;
-  border-radius:999px;margin-right:6px;color:#4b5563;
-}
-.pill{
-  background:#f3f4f6;border-radius:999px;padding:4px 8px;
-  font-size:12px;margin:2px 4px 2px 0;display:inline-block;
-}
 .empty{text-align:center;color:#999;padding:20px;}
 </style>
 </head>
@@ -88,7 +80,7 @@ input,select,textarea{
 <body>
 <header>
   <div class="wrap">
-    <h1>沪上阿姨管家（网页版 + 高清长图）</h1>
+    <h1>沪上阿姨管家（网页版 + 长图）</h1>
   </div>
 </header>
 
@@ -194,7 +186,7 @@ input,select,textarea{
 
 <script>
 // ========= IndexedDB =========
-const DB_NAME="ayi_db_final_v1";
+const DB_NAME="ayi_db_final_v2";
 let db=null;
 
 function openDB(){
@@ -432,11 +424,12 @@ async function loadList(){
 
 // ========= 预览（新标签页） =========
 function normalizePhotos(p){
+  p = p || {};
   return {
-    life:(p&&p.life)||[],
-    dishes:(p&&p.dishes)||[],
-    certs:(p&&p.certs)||[],
-    medical:(p&&p.medical)||[]
+    life:p.life||[],
+    dishes:p.dishes||[],
+    certs:p.certs||[],
+    medical:p.medical||[]
   };
 }
 function exportHTML(rec){
@@ -492,38 +485,9 @@ ${pic("体检证明",r.photos.medical)}
   win.document.close();
 }
 
-// ========= 长图 PNG（防闪退版） =========
-function buildLongImageHTML(r){
-  const p=normalizePhotos(r.photos);
-  const sec=(title,arr)=>arr.length?`
-    <h2 style="margin:20px 0 10px;">${title}</h2>
-    ${arr.map(p=>`
-      <img src="${p.dataURL}" style="width:100%;border-radius:12px;margin:12px 0;border:1px solid #ddd;">
-    `).join("")}
-  `:"";
-  return `
-<h1>${esc(r.name)} 档案</h1>
-<p>年龄：${r.age||""} 岁</p>
-<p>籍贯：${esc(r.origin)}</p>
-<p>属相：${esc(r.zodiac)}</p>
-<p>身高：${r.height||""} cm</p>
-<p>体重：${r.weight||""} kg</p>
-<p>学历：${esc(r.education)}</p>
-<p>住家：${esc(r.livein)}</p>
-<p>电话：${esc(r.phone)}</p>
-<p>城市：${(r.cities||[]).join("，")}</p>
-<p>技能：${(r.skills||[]).join("，")}</p>
-<p>薪资：${esc(r.salary)}</p>
-${r.notes?`<h2>备注</h2><p>${esc(r.notes)}</p>`:""}
-${sec("生活照 / 证件照",p.life)}
-${sec("菜品展示",p.dishes)}
-${sec("技能证书",p.certs)}
-${sec("体检证明",p.medical)}
-`;
-}
-async function buildImageHTMLFromRecord(r){
-  const p = normalizePhotos(r.photos || {});
-
+// ========= 长图 PNG：按“预览页面风格”截图 =========
+function buildImageHTMLFromRecord(r){
+  const p = normalizePhotos(r.photos);
   const sec = (title, arr) => arr && arr.length ? `
     <h2 style="margin:20px 0 10px;font-size:16px;">${title}</h2>
     ${arr.map(img => `
@@ -567,12 +531,9 @@ async function buildImageHTMLFromRecord(r){
 `;
 }
 
-// ⭐ 新的导出 PNG：用上面这段 HTML 做“网页 → 图片”
 async function exportPNG(rec){
-  // 先规范一下 photos 结构，避免旧数据报错
   const r = { ...rec, photos: normalizePhotos(rec.photos) };
 
-  // 在屏幕外面放一个隐藏容器，渲染出完整页面
   const box = document.createElement("div");
   box.style.position = "fixed";
   box.style.left = "-20000px";
@@ -583,9 +544,8 @@ async function exportPNG(rec){
   box.innerHTML = buildImageHTMLFromRecord(r);
   document.body.appendChild(box);
 
-  // 用 html2canvas 把这块 DOM 截成一张图
   const canvas = await html2canvas(box, {
-    scale: 2,          // 比之前 1.5 更清晰，但不会像 3 那么容易崩
+    scale: 2,          // 比 1.5 更清晰，又不会像 3 那么容易崩
     useCORS: true,
     allowTaint: true
   });
@@ -613,8 +573,7 @@ document.querySelectorAll("#q,#fq_city,#fq_age_min,#fq_age_max,#fq_skill")
   .forEach(el=>el.oninput=loadList);
 $("fq_livein").onchange=loadList;
 
-// 清空全部
-//（可以在控制台调用 dbClear() 手动清空）
+// 如需彻底清空可以在控制台执行 dbClear()
 loadList();
 </script>
 </body>
