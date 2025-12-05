@@ -16,8 +16,8 @@ label{display:block;margin:8px 0 6px;font-weight:600}
 input,select,textarea{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff}
 textarea{min-height:90px}
 .row{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
-.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
-@media (max-width:840px){.row{grid-template-columns:1fr}.col-4,.col-6,.col-12{grid-column:span 1}}
+.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
+@media (max-width:840px){.row{grid-template-columns:1fr}.col-3,.col-4,.col-6,.col-12{grid-column:span 1}}
 .btn{appearance:none;border:0;border-radius:10px;padding:10px 12px;cursor:pointer;font-weight:600}
 .btn-primary{background:var(--primary);color:#fff}.btn-ghost{background:#eef2ff;color:#1e40af}.btn-accent{background:var(--accent);color:#fff}
 .btn-danger{background:var(--danger);color:#fff}.btn-line{background:#fff;border:1px solid #e5e7eb}
@@ -35,6 +35,8 @@ textarea{min-height:90px}
 .file{display:flex;justify-content:space-between;align-items:center;padding:8px;border:1px dashed #e5e7eb;border-radius:10px;background:#fafafa}
 .right{position:absolute;right:8px;top:8px;display:flex;gap:6px}
 .empty{padding:24px;text-align:center;color:var(--muted)}
+.sec-title{margin-top:8px;font-weight:700;color:#334155}
+.hr{height:1px;background:#eef2f7;margin:10px 0}
 /* 导出长图用的隐藏容器 */
 #printRoot{position:fixed;left:-99999px;top:-99999px;width:800px;background:#fff;padding:20px}
 .print-title{font-weight:800;font-size:22px;margin:0 0 12px}
@@ -83,10 +85,21 @@ footer{color:#94a3b8;text-align:center;font-size:12px;padding:18px 0}
       <div class="col-12"><label>技能标签（逗号/顿号分隔）</label><input id="skills"></div>
       <div class="col-12"><label>备注</label><textarea id="notes"></textarea></div>
     </div>
+
+    <!-- 分类上传区 -->
+    <div class="hr"></div>
     <div class="row">
-      <div class="col-6"><label>上传照片</label><input id="photos" type="file" accept="image/*" multiple></div>
-      <div class="col-6"><label>上传附件</label><input id="attachments" type="file" multiple></div>
+      <div class="col-3"><label>生活照/证件照</label><input id="photos_life" type="file" accept="image/*" multiple></div>
+      <div class="col-3"><label>菜品展示</label><input id="photos_dishes" type="file" accept="image/*" multiple></div>
+      <div class="col-3"><label>技能证书</label><input id="photos_certs" type="file" accept="image/*" multiple></div>
+      <div class="col-3"><label>体检证明</label><input id="photos_medical" type="file" accept="image/*" multiple></div>
     </div>
+
+    <!-- 其他附件 -->
+    <div class="row" style="margin-top:8px">
+      <div class="col-12"><label>其他附件（PDF/图片/Word等）</label><input id="attachments" type="file" multiple></div>
+    </div>
+
     <div class="actions" style="margin-top:10px">
       <button id="btnSave" class="btn btn-primary">保存为新记录</button>
       <button id="btnReset" class="btn btn-line">清空表单</button>
@@ -123,25 +136,24 @@ footer{color:#94a3b8;text-align:center;font-size:12px;padding:18px 0}
         <button id="btnDemo" class="btn btn-warn">一键示例数据</button>
         <button id="btnWipe" class="btn btn-danger">清空全部</button>
       </div>
-      <div class="muted">双击卡片编辑 · 右上角有 复制 / 删除 / 生成长图</div>
+      <div class="muted">双击卡片编辑 · 右上角：复制 / 删除 / 生成长图</div>
     </div>
     <div id="list" class="list"></div>
     <div id="empty" class="empty" style="display:none">暂无数据</div>
   </section>
 </main>
 
-<!-- 隐藏的导出容器（生成长图时使用） -->
+<!-- 隐藏导出容器 -->
 <div id="printRoot"></div>
 
 <footer>© 沪上阿姨管家 · 本地离线 · GitHub Pages 版</footer>
 
-<!-- html2canvas 用于生成长图 -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
 
 <script>
 (function(){
 "use strict";
-const DB='ayi_web_v1',STORE='nannies';
+const DB='ayi_web_v2_catphotos',STORE='nannies';
 let db=null,CACHE=[],editingId=null;
 
 function $(id){return document.getElementById(id);}
@@ -151,14 +163,30 @@ function escapeHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 const toArray = (f)=>Array.from(f||[]);
 function fileToDataURL(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(file);});}
 
-// ===== IndexedDB =====
+// ---- DB ----
 function openDB(){return new Promise((res,rej)=>{if(db)return res(db);const req=indexedDB.open(DB,1);req.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains(STORE)){d.createObjectStore(STORE,{keyPath:'id'});}};req.onsuccess=()=>{db=req.result;res(db);};req.onerror=()=>rej(req.error);});}
 async function getAll(){const d=await openDB();return new Promise((res,rej)=>{const tx=d.transaction(STORE,'readonly');const os=tx.objectStore(STORE);const q=os.getAll();q.onsuccess=()=>res(q.result||[]);q.onerror=()=>rej(q.error);});}
 async function put(rec){const d=await openDB();return new Promise((res,rej)=>{const tx=d.transaction(STORE,'readwrite');tx.objectStore(STORE).put(rec);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
 async function removeById(id){const d=await openDB();return new Promise((res,rej)=>{const tx=d.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
 async function clearAll(){const d=await openDB();return new Promise((res,rej)=>{const tx=d.transaction(STORE,'readwrite');tx.objectStore(STORE).clear();tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
 
-// ===== 解析微信原文 =====
+// ---- 兼容老数据的照片结构 ----
+function normalizePhotos(photos){
+  // 新结构：{ life:[], dishes:[], certs:[], medical:[] }
+  if(!photos) return {life:[],dishes:[],certs:[],medical:[]};
+  if(Array.isArray(photos)){
+    // 老结构：数组 → 全部归到 life
+    return {life:photos, dishes:[], certs:[], medical:[]};
+  }
+  return {
+    life: Array.isArray(photos.life)? photos.life: [],
+    dishes: Array.isArray(photos.dishes)? photos.dishes: [],
+    certs: Array.isArray(photos.certs)? photos.certs: [],
+    medical: Array.isArray(photos.medical)? photos.medical: []
+  };
+}
+
+// ---- 解析微信原文 ----
 function parseRaw(){
   const t=$('raw').value.trim(); if(!t){alert('请粘贴原始资料'); return;}
   const get=(keys,f='')=>{for(const k of keys){const m=t.match(new RegExp(k+'[：: ]*([^\\n，,。；;]+)'));if(m)return m[1].trim();}return f;};
@@ -179,10 +207,18 @@ function parseRaw(){
 }
 function clearRaw(){ $('raw').value=''; }
 
-// ===== 收集 & 保存 =====
+// ---- 收集 & 保存 ----
 async function collect(){
-  const photos=await Promise.all(toArray($('photos').files).map(async f=>({name:f.name,type:f.type,size:f.size,dataURL:await fileToDataURL(f)})));
-  const atts=await Promise.all(toArray($('attachments').files).map(async f=>({name:f.name,type:f.type,size:f.size,dataURL:await fileToDataURL(f)})));
+  const pick = async (inputId)=>{
+    return Promise.all(toArray($(inputId).files).map(async f=>({name:f.name,type:f.type,size:f.size,dataURL:await fileToDataURL(f)})));
+  };
+  const photos = {
+    life: await pick('photos_life'),
+    dishes: await pick('photos_dishes'),
+    certs: await pick('photos_certs'),
+    medical: await pick('photos_medical')
+  };
+  const atts = await Promise.all(toArray($('attachments').files).map(async f=>({name:f.name,type:f.type,size:f.size,dataURL:await fileToDataURL(f)})));
   return {
     id: editingId || uuid(),
     name: $('name').value.trim(),
@@ -210,11 +246,11 @@ async function save(){
 function resetForm(){
   editingId=null;
   ['raw','name','age','origin','phone','exp','cities','salary','skills','notes','zodiac','height','weight','education'].forEach(id=>$(id).value='');
-  $('livein').value=''; $('photos').value=''; $('attachments').value='';
+  ['livein','photos_life','photos_dishes','photos_certs','photos_medical','attachments'].forEach(id=>$(id).value='');
   $('btnSave').textContent='保存为新记录';
 }
 
-// ===== 筛选 & 渲染 =====
+// ---- 筛选 ----
 function filter(arr){
   const q=($('q').value||'').toLowerCase();
   const livein=$('f_livein').value;
@@ -225,7 +261,8 @@ function filter(arr){
   const hmax=Number($('f_height_max').value)||null;
   const wmax=Number($('f_weight_max').value)||null;
 
-  return arr.filter(r=>{
+  return arr.filter(rr=>{
+    const r = {...rr, photos: normalizePhotos(rr.photos)};
     if(livein && r.livein!==livein) return false;
     if(city && !(r.cities||[]).some(c=>c.includes(city))) return false;
     if(zodiac && (!r.zodiac || !r.zodiac.includes(zodiac))) return false;
@@ -233,7 +270,6 @@ function filter(arr){
     if(hmin && r.height && r.height < hmin) return false;
     if(hmax && r.height && r.height > hmax) return false;
     if(wmax && r.weight && r.weight > wmax) return false;
-
     if(q){
       const blob=[r.name,r.origin,r.phone,r.salary,r.notes,r.zodiac,r.education,(r.skills||[]).join(','),(r.cities||[]).join(',')].join(' ').toLowerCase();
       if(!blob.includes(q)) return false;
@@ -242,20 +278,24 @@ function filter(arr){
   });
 }
 
+// ---- 渲染 ----
 function render(){
   const data = filter(CACHE);
   const list = $('list'), empty=$('empty');
   list.innerHTML=''; $('countInfo').textContent=`当前显示 ${data.length} / 总计 ${CACHE.length} 条`;
   empty.style.display = data.length ? 'none':'block';
 
-  data.forEach(r=>{
+  data.forEach(rr=>{
+    const r = {...rr, photos: normalizePhotos(rr.photos)};
     const el=document.createElement('div'); el.className='item';
 
-    const thumbs=(r.photos||[]).map((p,idx)=>`
+    const group = (arr)=> (arr||[]).map(p=>`
       <div style="text-align:center">
         <img src="${p.dataURL}" alt="${escapeHtml(p.name||'')}" onclick="window.open('${p.dataURL}','_blank')">
         <a href="${p.dataURL}" download="${escapeHtml(p.name||'photo.jpg')}" style="display:block;font-size:12px;color:#1e40af;margin-top:4px;text-decoration:none">下载</a>
       </div>`).join('');
+
+    const block = (title, arr)=> arr && arr.length ? `<div class="sec-title">${title}</div><div class="thumbs">${group(arr)}</div>` : '';
 
     const files=(r.attachments||[]).map(a=>{
       const sizeKB=a.size?(Math.round(a.size/1024)+' KB'):'';
@@ -277,12 +317,14 @@ function render(){
       <div><span class="badge">城市</span> ${(r.cities||[]).map(c=>'<span class="pill">'+escapeHtml(c)+'</span>').join('')}</div>
       <div><span class="badge">薪资</span> ${escapeHtml(r.salary||'')}</div>
       ${(r.skills&&r.skills.length)?('<div>'+r.skills.map(s=>'<span class="pill">'+escapeHtml(s)+'</span>').join('')+'</div>'):''}
-      ${thumbs?('<div class="thumbs">'+thumbs+'</div>'):''}
-      ${files?('<div class="files">'+files+'</div>'):''}
-      ${r.notes?('<div class="muted" style="margin-top:6px">'+escapeHtml(r.notes)+'</div>'):''}
+      ${block('生活照/证件照', r.photos.life)}
+      ${block('菜品展示', r.photos.dishes)}
+      ${block('技能证书', r.photos.certs)}
+      ${block('体检证明', r.photos.medical)}
+      ${files?('<div class="hr"></div><div class="files">'+files+'</div>'):''}
+      ${r.notes?('<div class="hr"></div><div class="muted">'+escapeHtml(r.notes)+'</div>'):''}
     `;
 
-    // 交互
     el.ondblclick = ()=> edit(r.id);
     el.querySelector('[data-act="clone"]').onclick = ()=> { editingId=null; fillForm(r); $('btnSave').textContent='保存为新记录'; window.scrollTo({top:0,behavior:'smooth'}); };
     el.querySelector('[data-act="del"]').onclick = async ()=> { if(confirm('确定删除这条记录吗？')){ await removeById(r.id); reload(); } };
@@ -301,29 +343,31 @@ function fillForm(r){
   $('salary').value=r.salary||'';
   $('skills').value=(r.skills||[]).join('、');
   $('notes').value=r.notes||'';
-  $('photos').value=''; $('attachments').value='';
+  ['photos_life','photos_dishes','photos_certs','photos_medical','attachments'].forEach(id=>$(id).value='');
 }
 function edit(id){
-  const r=CACHE.find(x=>x.id===id); if(!r) return;
+  const r0=CACHE.find(x=>x.id===id); if(!r0) return;
+  const r={...r0, photos:normalizePhotos(r0.photos)};
   editingId=r.id; fillForm(r); $('btnSave').textContent='保存更改'; window.scrollTo({top:0,behavior:'smooth'});
 }
 async function reload(){ CACHE=await getAll(); CACHE.sort((a,b)=>new Date(b.updatedAt||0)-new Date(a.updatedAt||0)); render(); }
 
-// 导出长图（标题+答案样式）
-async function exportLongImage(rec){
+// ---- 导出长图（分分类渲染） ----
+async function exportLongImage(rec0){
+  const rec = {...rec0, photos: normalizePhotos(rec0.photos)};
   const root = $('printRoot');
-  root.innerHTML = ''; // 清空
+  root.innerHTML = '';
+
+  const title=document.createElement('h2'); title.className='print-title';
+  title.textContent = rec.name ? `阿姨档案：${rec.name}` : '阿姨档案';
+  root.appendChild(title);
+
   const addRow = (k,v)=>{
     const row=document.createElement('div'); row.className='print-row';
     row.innerHTML = `<div class="print-key">${escapeHtml(k)}</div><div class="print-val">${escapeHtml(v||'')}</div>`;
     root.appendChild(row);
   };
-  // 标题
-  const title=document.createElement('h2'); title.className='print-title';
-  title.textContent = rec.name ? `阿姨档案：${rec.name}` : '阿姨档案';
-  root.appendChild(title);
 
-  // 主体（标题：答案）
   addRow('姓名', rec.name);
   addRow('年龄', rec.age? (rec.age+' 岁'):'');
   addRow('籍贯', rec.origin);
@@ -339,31 +383,26 @@ async function exportLongImage(rec){
   addRow('技能标签', (rec.skills||[]).join('、'));
   addRow('备注', rec.notes);
 
-  // 照片区域
-  if(rec.photos && rec.photos.length){
-    const phTitle=document.createElement('h3');
-    phTitle.textContent='照片';
-    root.appendChild(phTitle);
+  const addPhotos = (title, arr)=>{
+    if(!arr || !arr.length) return;
+    const h3=document.createElement('h3'); h3.textContent=title; root.appendChild(h3);
     const box=document.createElement('div'); box.className='print-photos';
-    rec.photos.forEach(p=>{
-      const img=new Image(); img.src=p.dataURL; img.loading='eager';
-      box.appendChild(img);
-    });
+    arr.forEach(p=>{ const img=new Image(); img.src=p.dataURL; img.loading='eager'; box.appendChild(img); });
     root.appendChild(box);
-    // 等待图片加载完再截图
-    await new Promise(r=>setTimeout(r,300));
-  }
+  };
+  addPhotos('生活照/证件照', rec.photos.life);
+  addPhotos('菜品展示', rec.photos.dishes);
+  addPhotos('技能证书', rec.photos.certs);
+  addPhotos('体检证明', rec.photos.medical);
 
-  // 生成画布
-  const dpr = Math.min(window.devicePixelRatio||1, 2); // 限高DPR避免超大图
-  const canvas = await html2canvas(root, {backgroundColor:'#ffffff', scale:dpr, useCORS:true});
+  // 等待图片绘制
+  await new Promise(r=>setTimeout(r,300));
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const canvas=await html2canvas(root,{backgroundColor:'#ffffff',scale:dpr,useCORS:true});
   canvas.toBlob(async (blob)=>{
-    const url = URL.createObjectURL(blob);
-    // 下载
-    const a=document.createElement('a');
-    a.href=url; a.download=`${rec.name||'阿姨'}-档案.png`; a.click();
-    // 移动端分享（可选）
-    if(navigator.canShare && navigator.canShare({files:[new File([blob], 'card.png', {type: blob.type})]})){
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=`${rec.name||'阿姨'}-档案.png`; a.click();
+    if(navigator.canShare && navigator.canShare({files:[new File([blob],'card.png',{type:blob.type})]})){
       try{ await navigator.share({files:[new File([blob],'card.png',{type:blob.type})], title:'阿姨档案'}); }catch(e){}
     }
     setTimeout(()=>URL.revokeObjectURL(url), 1000);
@@ -378,19 +417,29 @@ function exportJSON(){
 }
 async function importJSON(f){
   if(!f) return; const txt=await f.text();
-  try{ const arr=JSON.parse(txt); if(!Array.isArray(arr)) throw new Error('JSON 须是数组'); for(const r of arr){ if(r&&r.id) await put(r); } reload(); }
-  catch(e){ alert('导入失败：'+e.message); }
+  try{
+    const arr=JSON.parse(txt);
+    if(!Array.isArray(arr)) throw new Error('JSON 须是数组');
+    // 导入时也做一次兼容转换
+    for(const r0 of arr){
+      const r={...r0, photos: normalizePhotos(r0.photos)};
+      await put(r);
+    }
+    reload();
+  }catch(e){ alert('导入失败：'+e.message); }
 }
 async function demo(){
   const now=new Date().toISOString();
   const list=[{
     id:uuid(),name:'张阿姨',age:46,origin:'江苏徐州',phone:'13812345678',exp:8,livein:'是',zodiac:'牛',
     height:160,weight:55,education:'高中',cities:['上海','苏州'],salary:'9000-11000/月',
-    skills:['带娃','做饭','早教'],notes:'持育婴师证，擅长营养餐',photos:[],attachments:[],updatedAt:now
+    skills:['带娃','做饭','早教'],notes:'持育婴师证，擅长营养餐',
+    photos:{life:[],dishes:[],certs:[],medical:[]},attachments:[],updatedAt:now
   },{
     id:uuid(),name:'王姐',age:52,origin:'安徽阜阳',phone:'13911112222',exp:10,livein:'否',zodiac:'猴',
     height:158,weight:60,education:'大专',cities:['杭州'],salary:'7000-9000/月',
-    skills:['做饭','收纳'],notes:'擅长江浙菜，周末可加班',photos:[],attachments:[],updatedAt:now
+    skills:['做饭','收纳'],notes:'擅长江浙菜，周末可加班',
+    photos:{life:[],dishes:[],certs:[],medical:[]},attachments:[],updatedAt:now
   }];
   for(const r of list) await put(r); reload();
 }
