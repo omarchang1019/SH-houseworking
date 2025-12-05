@@ -787,24 +787,25 @@ async function exportLongImage(rec0){
   setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 
-// 客户预览页：居中卡片，点击图片在新窗口打开大图（不再用弹窗脚本）
+// 客户预览页：卡片布局，小图 = 打开新页面大图的快捷键
 function exportInteractivePage(rec0){
   const r = { ...rec0, photos: normalizePhotos(rec0.photos) };
   const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
+  // 每一类图片的模块：标题 + 若干缩略图（点击触发 __openImg）
   const section = (title, arr) => (arr && arr.length) ? `
     <h3>${esc(title)}</h3>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;margin:8px 0">
+    <div class="img-grid">
       ${arr.map(p => `
-        <a href="${p.dataURL}" target="_blank" style="display:inline-block">
-          <img src="${p.dataURL}"
-               style="width:200px;height:200px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb"/>
-        </a>
+        <div class="img-wrap">
+          <img src="${p.dataURL}" alt="${esc(p.name || '')}"
+               onclick="return __openImg(${JSON.stringify(p.dataURL)})">
+        </div>
       `).join('')}
     </div>` : '';
 
   const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes"/>
 <title>${esc(r.name || '阿姨')} - 档案预览</title>
 <style>
 body{
@@ -826,7 +827,7 @@ body{
   padding:18px 16px 20px;
 }
 h1{margin:0 0 12px;font-size:20px;}
-h3{margin:14px 0 8px;font-size:15px;}
+h3{margin:16px 0 8px;font-size:15px;}
 .row{display:flex;gap:10px;margin:4px 0;}
 .key{width:96px;color:#374151;font-weight:600;}
 .pills span{
@@ -838,6 +839,24 @@ h3{margin:14px 0 8px;font-size:15px;}
   font-size:12px;
 }
 .hr{height:1px;background:#e5e7eb;margin:12px 0;}
+.img-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin:6px 0 4px;
+}
+.img-wrap{
+  flex:1 1 260px;
+  max-width:320px;
+}
+.img-wrap img{
+  width:100%;
+  height:auto;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  display:block;
+  cursor:pointer;
+}
 </style>
 </head><body>
 <div class="wrap">
@@ -870,6 +889,22 @@ h3{margin:14px 0 8px;font-size:15px;}
     ${section('体检证明', r.photos.medical)}
   </div>
 </div>
+
+<script>
+// 点击缩略图：新开一个只包含这一张大图的页面
+function __openImg(dataURL){
+  var html = '<!DOCTYPE html><html><head><meta charset="utf-8">'+
+             '<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes">'+
+             '</head><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;">'+
+             '<img src="'+ dataURL.replace(/"/g,'&quot;') +'" '+
+             'style="max-width:100vw;max-height:100vh;display:block;"/>'+
+             '</body></html>';
+  var url = URL.createObjectURL(new Blob([html], {type:'text/html'}));
+  window.open(url, '_blank');
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+  return false;
+}
+<\/script>
 </body></html>`;
 
   const url = URL.createObjectURL(new Blob([html], {type:'text/html'}));
