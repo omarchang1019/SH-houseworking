@@ -1,294 +1,68 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>沪上阿姨管家（在线版·长图生成）</title>
+//----------------------------------------------------
+//  ⭐ 客户预览：直接在新标签页打开，不下载文件
+//----------------------------------------------------
+function exportHTML(rec){
+  const r = {...rec, photos: normalizePhotos(rec.photos)};
+  const escHtml = s => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");
 
-<!-- html2canvas 用于生成长图 PNG -->
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  const picSection = (title, arr)=> arr.length ? `
+    <h3>${title}</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;">
+      ${arr.map(p=>`
+        <div style="flex:1 1 260px;max-width:330px;">
+          <img src="${p.dataURL}" style="width:100%;border-radius:10px;border:1px solid #ddd;">
+        </div>`).join("")}
+    </div>
+  `:"";
 
+  const html = `
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${escHtml(r.name)} 档案预览</title>
 <style>
-:root{
-  --bg:#F7F4EF;
-  --card:#fff;
-  --text:#1A1A1A;
-  --muted:#6B7280;
-  --primary:#1F3A5F;
-  --accent:#C8A96A;
-  --danger:#ef4444;
-  --radius:16px;
-  --shadow:0 8px 24px rgba(0,0,0,.08);
-}
-*{box-sizing:border-box;}
-body{
-  margin:0;background:var(--bg);
-  font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-  color:var(--text);
-}
-header{
-  position:sticky;top:0;z-index:10;
-  background:#fff;border-bottom:1px solid #e5e7eb;
-}
-.wrap{max-width:1180px;margin:0 auto;padding:16px;}
-h1{margin:6px 0;font-size:20px;}
-.card{
-  background:var(--card);
-  border-radius:var(--radius);
-  padding:16px;
-  box-shadow:var(--shadow);
-  margin-bottom:16px;
-}
-.row{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;}
-.col-4{grid-column:span 4;} .col-6{grid-column:span 6;} .col-12{grid-column:span 12;}
-
-label{font-weight:600;margin-bottom:6px;display:block;}
-input,select,textarea{
-  width:100%;padding:10px;border:1px solid #d1d5db;border-radius:10px;
-}
-
-.btn{
-  padding:8px 12px;border-radius:10px;border:none;cursor:pointer;
-  font-weight:600;
-}
-.btn-primary{background:var(--primary);color:#fff;}
-.btn-line{background:#fff;border:1px solid #d1d5db;}
-.btn-danger{background:var(--danger);color:#fff;}
-.btn-accent{background:var(--accent);color:#fff;}
-.btn-warn{background:#f59e0b;color:#fff;}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
-
-.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
-.item{
-  background:#fff;border:1px solid #e5e7eb;
-  border-radius:14px;padding:14px;
-  box-shadow:0 2px 10px rgba(0,0,0,.04);
-  position:relative;
-}
-.item h3{margin:0 0 8px;}
-.right{
-  position:absolute;right:10px;top:10px;
-  display:flex;gap:6px;
-}
-.meta{font-size:12px;color:#6b7280;margin-bottom:6px;}
-.badge{
-  font-size:12px;padding:4px 6px;background:#eef2ff;
-  border-radius:999px;margin-right:6px;color:#4b5563;
-}
-.pill{
-  background:#f3f4f6;border-radius:999px;padding:4px 8px;
-  font-size:12px;margin:2px 4px 2px 0;display:inline-block;
-}
-.thumbs img{
-  width:72px;height:72px;object-fit:cover;border:1px solid #e5e7eb;
-  border-radius:10px;margin-right:6px;
-}
-.files .file{
-  padding:6px;border:1px dashed #e5e7eb;border-radius:10px;
-  display:flex;justify-content:space-between;margin-top:6px;
-}
-.empty{text-align:center;color:#999;padding:20px;}
+body{font:14px/1.6 -apple-system,Segoe UI,Roboto;padding:16px;background:#f3f4f6;}
+.card{max-width:900px;margin:0 auto;background:#fff;padding:20px;border-radius:12px;border:1px solid #e5e7eb;}
+.row{display:flex;gap:10px;margin:6px 0;}
+.key{width:90px;color:#555;font-weight:600;}
+.pill{background:#f3f4f6;border-radius:999px;padding:4px 8px;margin-right:4px;font-size:12px;}
 </style>
-</head>
+</head><body>
+<div class="card">
+<h2>${escHtml(r.name)} 档案</h2>
 
-<body>
-<header>
-  <div class="wrap">
-    <h1>沪上阿姨管家（在线版 + 高清长图导出）</h1>
-  </div>
-</header>
+<div class="row"><div class="key">年龄</div><div>${r.age||""} 岁</div></div>
+<div class="row"><div class="key">籍贯</div><div>${escHtml(r.origin)}</div></div>
+<div class="row"><div class="key">属相</div><div>${escHtml(r.zodiac)}</div></div>
+<div class="row"><div class="key">身高</div><div>${r.height||""} cm</div></div>
+<div class="row"><div class="key">体重</div><div>${r.weight||""} kg</div></div>
+<div class="row"><div class="key">学历</div><div>${escHtml(r.education)}</div></div>
+<div class="row"><div class="key">住家</div><div>${escHtml(r.livein)}</div></div>
+<div class="row"><div class="key">电话</div><div>${escHtml(r.phone)}</div></div>
 
-<main class="wrap">
+<div class="row"><div class="key">城市</div>
+  <div>${(r.cities||[]).map(c=>`<span class="pill">${escHtml(c)}</span>`).join("")}</div>
+</div>
 
-<!-- ===========================
-      录入表单
-=========================== -->
-<section class="card">
-  <h2>录入 / 编辑</h2>
+<div class="row"><div class="key">技能</div>
+  <div>${(r.skills||[]).map(s=>`<span class="pill">${escHtml(s)}</span>`).join("")}</div>
+</div>
 
-  <label>原始资料（自动识别）</label>
-  <textarea id="raw" style="min-height:100px"></textarea>
-  <div class="actions">
-    <button class="btn btn-line" id="btnParse">智能识别</button>
-    <button class="btn btn-line" id="btnClearRaw">清空</button>
-  </div>
+<div class="row"><div class="key">薪资</div><div>${escHtml(r.salary)}</div></div>
 
-  <div class="row">
-    <div class="col-4"><label>姓名</label><input id="name"></div>
-    <div class="col-4"><label>年龄</label><input id="age" type="number"></div>
-    <div class="col-4"><label>籍贯</label><input id="origin"></div>
+${r.notes? `<h3>备注</h3><div>${escHtml(r.notes)}</div>`:""}
 
-    <div class="col-4"><label>属相</label><input id="zodiac"></div>
-    <div class="col-4"><label>身高(cm)</label><input id="height" type="number"></div>
-    <div class="col-4"><label>体重(kg)</label><input id="weight" type="number"></div>
+${picSection("生活照 / 证件照", r.photos.life)}
+${picSection("菜品展示", r.photos.dishes)}
+${picSection("技能证书", r.photos.certs)}
+${picSection("体检证明", r.photos.medical)}
 
-    <div class="col-6"><label>学历</label><input id="education"></div>
-    <div class="col-6"><label>联系方式</label><input id="phone"></div>
+</div></body></html>`;
 
-    <div class="col-4"><label>从业年限</label><input id="exp" type="number"></div>
-    <div class="col-4"><label>住家</label>
-      <select id="livein">
-        <option value="">不限</option>
-        <option value="是">是</option>
-        <option value="否">否</option>
-      </select>
-    </div>
-    <div class="col-4"><label>期望薪资</label><input id="salary"></div>
-
-    <div class="col-6"><label>服务城市（逗号分隔）</label><input id="cities"></div>
-    <div class="col-6"><label>技能标签（逗号分隔）</label><input id="skills"></div>
-
-    <div class="col-12"><label>备注</label><textarea id="notes" style="min-height:80px"></textarea></div>
-  </div>
-
-  <h3>上传照片（分类）</h3>
-  <div class="row">
-    <div class="col-6">
-      <label>生活照 / 证件照</label>
-      <input type="file" id="photos_life" accept="image/*" multiple>
-    </div>
-    <div class="col-6">
-      <label>菜品展示</label>
-      <input type="file" id="photos_dishes" accept="image/*" multiple>
-    </div>
-    <div class="col-6">
-      <label>技能证书</label>
-      <input type="file" id="photos_certs" accept="image/*" multiple>
-    </div>
-    <div class="col-6">
-      <label>体检证明</label>
-      <input type="file" id="photos_medical" accept="image/*" multiple>
-    </div>
-  </div>
-
-  <div class="actions">
-    <button class="btn btn-primary" id="btnSave">保存</button>
-    <button class="btn btn-line" id="btnReset">清空表单</button>
-  </div>
-</section>
-
-<!-- ===========================
-      筛选
-=========================== -->
-<section class="card">
-  <h2>筛选 / 搜索</h2>
-  <div class="row">
-    <div class="col-4"><label>关键词</label><input id="q"></div>
-    <div class="col-4"><label>住家</label>
-      <select id="fq_livein">
-        <option value="">不限</option>
-        <option value="是">是</option>
-        <option value="否">否</option>
-      </select>
-    </div>
-    <div class="col-4"><label>城市</label><input id="fq_city"></div>
-
-    <div class="col-4"><label>年龄 ≥</label><input id="fq_age_min" type="number"></div>
-    <div class="col-4"><label>年龄 ≤</label><input id="fq_age_max" type="number"></div>
-
-    <div class="col-4"><label>技能包含</label><input id="fq_skill"></div>
-  </div>
-  <div class="actions">
-    <button class="btn btn-line" id="btnClearFilter">清空筛选</button>
-    <span style="color:#666" id="countInfo"></span>
-  </div>
-</section>
-
-<!-- ===========================
-      列表
-=========================== -->
-<section class="card">
-  <div class="actions">
-    <button class="btn btn-accent" id="btnExportHTML">导出网页预览</button>
-    <button class="btn btn-warn" id="btnExportPNG">导出长图 PNG（高清）</button>
-    <button class="btn btn-danger" id="btnWipe">清空所有数据</button>
-  </div>
-
-  <div id="list" class="list"></div>
-  <div id="empty" class="empty" style="display:none">暂无数据</div>
-</section>
-
-</main>
-
-<script>
-// ===============================================
-//              IndexedDB 数据库
-// ===============================================
-const DB = "ayi_v3";
-let db = null;
-
-function openDB(){
-  return new Promise((res,rej)=>{
-    const req = indexedDB.open(DB,1);
-    req.onupgradeneeded = e=>{
-      const db = req.result;
-      db.createObjectStore("nannies",{keyPath:"id"});
-    };
-    req.onsuccess = ()=>{ db=req.result; res(db); };
-    req.onerror  = ()=>rej(req.error);
-  });
-}
-
-async function dbAll(){
-  await openDB();
-  return new Promise((res,rej)=>{
-    const tx=db.transaction("nannies","readonly");
-    const os=tx.objectStore("nannies");
-    const r=os.getAll();
-    r.onsuccess=()=>res(r.result||[]);
-    r.onerror=()=>rej(r.error);
-  });
-}
-
-async function dbPut(rec){
-  await openDB();
-  return new Promise((res,rej)=>{
-    const tx=db.transaction("nannies","readwrite");
-    tx.objectStore("nannies").put(rec);
-    tx.oncomplete=()=>res();
-    tx.onerror=()=>rej(tx.error);
-  });
-}
-
-async function dbDel(id){
-  await openDB();
-  return new Promise((res,rej)=>{
-    const tx=db.transaction("nannies","readwrite");
-    tx.objectStore("nannies").delete(id);
-    tx.oncomplete=()=>res();
-    tx.onerror=()=>rej(tx.error);
-  });
-}
-
-async function dbClear(){
-  await openDB();
-  return new Promise((res,rej)=>{
-    const tx=db.transaction("nannies","readwrite");
-    tx.objectStore("nannies").clear();
-    tx.oncomplete=()=>res();
-    tx.onerror=()=>rej(tx.error);
-  });
-}
-
-// ===============================================
-//          工具函数
-// ===============================================
-function $(id){return document.getElementById(id);}
-function uuid(){return "id-"+Math.random().toString(36).slice(2)+Date.now().toString(36);}
-function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");}
-
-function normList(s){
-  return (s||"").replace(/[、；;，]/g,",")
-    .split(",").map(x=>x.trim()).filter(Boolean);
-}
-
-function fileToDataURL(f){
-  return new Promise((res,rej)=>{
-    const r=new FileReader();
-    r.onload=()=>res(r.result);
-    r.onerror=()=>rej(r.error);
-    r.readAsDataURL(f);
-  });
+  // ⭐ 不下载 → 直接打开新标签页
+  const win = window.open("", "_blank");
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
 }
 //----------------------------------------------------
 //         自动解析原始资料（微信复制的文本）
@@ -461,13 +235,14 @@ async function loadList(){
       <div class="meta">技能：${(r.skills||[]).join("，")}</div>
     `;
 
-    const btnPreview = wrap.querySelector('[data-act="preview"]');
-    const btnPNG = wrap.querySelector('[data-act="png"]');
-    const btnDel = wrap.querySelector('[data-act="del"]');
-
-    btnPreview.onclick = ()=> exportHTML(r);
-    btnPNG.onclick = ()=> exportPNG(r);
-    btnDel.onclick = async()=>{ if(confirm("确定删除？")){ await dbDel(r.id); loadList(); } };
+    wrap.querySelector('[data-act="preview"]').onclick = ()=> exportHTML(r);
+    wrap.querySelector('[data-act="png"]').onclick = ()=> exportPNG(r);
+    wrap.querySelector('[data-act="del"]').onclick = async()=>{
+      if(confirm("确定删除？")){
+        await dbDel(r.id);
+        loadList();
+      }
+    };
 
     wrap.ondblclick = ()=> editRecord(r.id);
     list.appendChild(wrap);
@@ -498,28 +273,36 @@ function editRecord(id){
 }
 
 //----------------------------------------------------
-//  ⭐ 客户预览：直接在新标签页打开，不下载文件
+// ⭐ 预览：直接打开新标签页（不下载）
 //----------------------------------------------------
-function exportHTML(rec){
-  const r = {...rec, photos: normalizePhotos(rec.photos)};
-  const escHtml = s => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function normalizePhotos(p){
+  return {
+    life:p.life||[], dishes:p.dishes||[],
+    certs:p.certs||[], medical:p.medical||[]
+  };
+}
 
-  const picSection = (title, arr)=> arr.length ? `
+function exportHTML(rec){
+  const r={...rec,photos:normalizePhotos(rec.photos)};
+  const escHtml = s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+
+  const pic = (title, arr)=> arr.length?`
     <h3>${title}</h3>
     <div style="display:flex;flex-wrap:wrap;gap:12px;">
       ${arr.map(p=>`
         <div style="flex:1 1 260px;max-width:330px;">
           <img src="${p.dataURL}" style="width:100%;border-radius:10px;border:1px solid #ddd;">
-        </div>`).join("")}
+        </div>
+      `).join("")}
     </div>
   `:"";
 
   const html = `
-<!DOCTYPE html><html><head><meta charset="utf-8">
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${escHtml(r.name)} 档案预览</title>
 <style>
-body{font:14px/1.6 -apple-system,Segoe UI,Roboto;padding:16px;background:#f3f4f6;}
+body{font:14px/1.6 -apple-system,Segoe UI,Roboto;padding:20px;background:#f3f4f6;}
 .card{max-width:900px;margin:0 auto;background:#fff;padding:20px;border-radius:12px;border:1px solid #e5e7eb;}
 .row{display:flex;gap:10px;margin:6px 0;}
 .key{width:90px;color:#555;font-weight:600;}
@@ -550,14 +333,13 @@ body{font:14px/1.6 -apple-system,Segoe UI,Roboto;padding:16px;background:#f3f4f6
 
 ${r.notes? `<h3>备注</h3><div>${escHtml(r.notes)}</div>`:""}
 
-${picSection("生活照 / 证件照", r.photos.life)}
-${picSection("菜品展示", r.photos.dishes)}
-${picSection("技能证书", r.photos.certs)}
-${picSection("体检证明", r.photos.medical)}
+${pic("生活照 / 证件照", r.photos.life)}
+${pic("菜品展示", r.photos.dishes)}
+${pic("技能证书", r.photos.certs)}
+${pic("体检证明", r.photos.medical)}
 
 </div></body></html>`;
 
-  // ⭐ 不下载 → 直接打开新标签页
   const win = window.open("", "_blank");
   win.document.open();
   win.document.write(html);
@@ -565,71 +347,65 @@ ${picSection("体检证明", r.photos.medical)}
 }
 
 //----------------------------------------------------
-//  ⭐ 一键导出高清长图（PNG）— 稳定版，防闪退
+//  ⭐ 稳定版高清长图导出（scale=1.5，防闪退）
 //----------------------------------------------------
-async function exportPNG(rec){
-  // 临时容器（隐藏）
-  const box=document.createElement("div");
-  box.style.position="fixed";
-  box.style.left="-20000px";
-  box.style.top="0";
-  box.style.width="760px";   // 原900px改成更安全的760
-  box.style.padding="20px";
-  box.style.background="#fff";
-  document.body.appendChild(box);
-
-  box.innerHTML = buildLongImageHTML(rec);
-
-  // ⭐ 降低 scale（从3 → 1.5）防止生成超大图片闪退
-  const canvas = await html2canvas(box,{
-    scale: 1.5,
-    useCORS: true,
-    allowTaint: true,
-    windowWidth: 760
-  });
-
-  const url = canvas.toDataURL("image/png");
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${rec.name}_档案长图.png`;
-  a.click();
-
-  box.remove();
-}
-
-//------ 生成长图的 HTML 内容（纯展示用） ------
 function buildLongImageHTML(r){
   const p = normalizePhotos(r.photos);
-  const imgSec = (title, arr)=> arr.length?`
+  const sec=(title,arr)=>arr.length?`
     <h2 style="margin:20px 0 10px;">${title}</h2>
     ${arr.map(p=>`
-      <img src="${p.dataURL}" style="width:100%;margin-bottom:12px;border-radius:12px;border:1px solid #ddd;">
+      <img src="${p.dataURL}"
+           style="width:100%;border-radius:12px;margin:12px 0;border:1px solid #ddd;">
     `).join("")}
   `:"";
 
   return `
-<div style="font-family:-apple-system,Segoe UI,Roboto;">
-  <h1>${esc(r.name)} 档案</h1>
-  <p>年龄：${r.age||""} 岁</p>
-  <p>籍贯：${esc(r.origin)}</p>
-  <p>属相：${esc(r.zodiac)}</p>
-  <p>身高：${r.height||""} cm</p>
-  <p>体重：${r.weight||""} kg</p>
-  <p>学历：${esc(r.education)}</p>
-  <p>住家：${esc(r.livein)}</p>
-  <p>电话：${esc(r.phone)}</p>
-  <p>城市：${(r.cities||[]).join("，")}</p>
-  <p>技能：${(r.skills||[]).join("，")}</p>
-  <p>薪资：${esc(r.salary)}</p>
+<h1>${esc(r.name)} 档案</h1>
+<p>年龄：${r.age||""} 岁</p>
+<p>籍贯：${esc(r.origin)}</p>
+<p>属相：${esc(r.zodiac)}</p>
+<p>身高：${r.height||""} cm</p>
+<p>体重：${r.weight||""} kg</p>
+<p>学历：${esc(r.education)}</p>
+<p>住家：${esc(r.livein)}</p>
+<p>电话：${esc(r.phone)}</p>
+<p>城市：${(r.cities||[]).join("，")}</p>
+<p>技能：${(r.skills||[]).join("，")}</p>
+<p>薪资：${esc(r.salary)}</p>
 
-  ${r.notes? `<h2>备注</h2><p>${esc(r.notes)}</p>`:""}
+${r.notes? `<h2>备注</h2><p>${esc(r.notes)}</p>`:""}
 
-  ${imgSec("生活照 / 证件照", p.life)}
-  ${imgSec("菜品展示", p.dishes)}
-  ${imgSec("技能证书", p.certs)}
-  ${imgSec("体检证明", p.medical)}
-</div>
+${sec("生活照 / 证件照", p.life)}
+${sec("菜品展示", p.dishes)}
+${sec("技能证书", p.certs)}
+${sec("体检证明", p.medical)}
 `;
+}
+
+async function exportPNG(rec){
+  const box=document.createElement("div");
+  box.style.position="fixed";
+  box.style.left="-20000px";
+  box.style.top="0";
+  box.style.width="760px";    // 更安全的宽度（防闪退）
+  box.style.padding="20px";
+  box.style.background="#fff";
+  box.innerHTML=buildLongImageHTML(rec);
+  document.body.appendChild(box);
+
+  const canvas = await html2canvas(box,{
+    scale:1.5,       // 清晰但不会爆内存
+    useCORS:true,
+    allowTaint:true
+  });
+
+  const url=canvas.toDataURL("image/png");
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=`${rec.name}_档案长图.png`;
+  a.click();
+
+  box.remove();
 }
 
 //----------------------------------------------------
@@ -653,11 +429,10 @@ $("btnWipe").onclick=async()=>{
 
 document.querySelectorAll("#q,#fq_city,#fq_age_min,#fq_age_max,#fq_skill")
   .forEach(el=> el.oninput=loadList);
+
 $("fq_livein").onchange=loadList;
 
-// 初始化
 loadList();
-
 </script>
 </body>
 </html>
