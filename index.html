@@ -521,26 +521,81 @@ ${sec("技能证书",p.certs)}
 ${sec("体检证明",p.medical)}
 `;
 }
+async function buildImageHTMLFromRecord(r){
+  const p = normalizePhotos(r.photos || {});
+
+  const sec = (title, arr) => arr && arr.length ? `
+    <h2 style="margin:20px 0 10px;font-size:16px;">${title}</h2>
+    ${arr.map(img => `
+      <img src="${img.dataURL}"
+           style="width:100%;border-radius:12px;margin:12px 0;border:1px solid #ddd;">
+    `).join("")}
+  ` : "";
+
+  return `
+<div style="
+  max-width:900px;
+  margin:0 auto;
+  background:#ffffff;
+  padding:20px;
+  border-radius:12px;
+  border:1px solid #e5e7eb;
+  font:14px/1.6 -apple-system,Segoe UI,Roboto;
+  color:#111827;
+">
+  <h2 style="margin:0 0 12px 0;font-size:20px;">${esc(r.name)} 档案</h2>
+
+  <p>年龄：${r.age || ""} 岁</p>
+  <p>籍贯：${esc(r.origin)}</p>
+  <p>属相：${esc(r.zodiac)}</p>
+  <p>身高：${r.height || ""} cm</p>
+  <p>体重：${r.weight || ""} kg</p>
+  <p>学历：${esc(r.education)}</p>
+  <p>住家：${esc(r.livein)}</p>
+  <p>电话：${esc(r.phone)}</p>
+  <p>城市：${(r.cities || []).join("，")}</p>
+  <p>技能：${(r.skills || []).join("，")}</p>
+  <p>薪资：${esc(r.salary)}</p>
+
+  ${r.notes ? `<h2 style="margin:20px 0 10px;font-size:16px;">备注</h2><p>${esc(r.notes)}</p>` : ""}
+
+  ${sec("生活照 / 证件照", p.life)}
+  ${sec("菜品展示", p.dishes)}
+  ${sec("技能证书", p.certs)}
+  ${sec("体检证明", p.medical)}
+</div>
+`;
+}
+
+// ⭐ 新的导出 PNG：用上面这段 HTML 做“网页 → 图片”
 async function exportPNG(rec){
-  const box=document.createElement("div");
-  box.style.position="fixed";
-  box.style.left="-20000px";
-  box.style.top="0";
-  box.style.width="760px";   // 安全宽度
-  box.style.padding="20px";
-  box.style.background="#fff";
-  box.innerHTML=buildLongImageHTML(rec);
+  // 先规范一下 photos 结构，避免旧数据报错
+  const r = { ...rec, photos: normalizePhotos(rec.photos) };
+
+  // 在屏幕外面放一个隐藏容器，渲染出完整页面
+  const box = document.createElement("div");
+  box.style.position = "fixed";
+  box.style.left = "-20000px";
+  box.style.top = "0";
+  box.style.width = "900px";
+  box.style.padding = "20px";
+  box.style.background = "#f3f4f6";
+  box.innerHTML = buildImageHTMLFromRecord(r);
   document.body.appendChild(box);
-  const canvas=await html2canvas(box,{
-    scale:1.5,              // 清晰但不爆内存
-    useCORS:true,
-    allowTaint:true
+
+  // 用 html2canvas 把这块 DOM 截成一张图
+  const canvas = await html2canvas(box, {
+    scale: 2,          // 比之前 1.5 更清晰，但不会像 3 那么容易崩
+    useCORS: true,
+    allowTaint: true
   });
-  const url=canvas.toDataURL("image/png");
-  const a=document.createElement("a");
-  a.href=url;
-  a.download=`${rec.name}_档案长图.png`;
+
+  const url = canvas.toDataURL("image/png");
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${r.name}_档案长图.png`;
   a.click();
+
   box.remove();
 }
 
