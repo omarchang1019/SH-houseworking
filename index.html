@@ -787,23 +787,25 @@ async function exportLongImage(rec0){
   setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 
-// 客户预览页：居中卡片 + 大图查看（无导出按钮）
+// 客户预览页：居中卡片 + 大图查看（无任何说明文字、无导出按钮）
 function exportInteractivePage(rec0){
-  const r={...rec0, photos:normalizePhotos(rec0.photos)};
-  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const r = { ...rec0, photos: normalizePhotos(rec0.photos) };
+  const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-  const section=(title,arr)=> (arr && arr.length)?
-    `<h3>${esc(title)}</h3>
-     <div style="display:flex;flex-wrap:wrap;gap:10px;margin:8px 0">
-       ${arr.map(p=>`
-         <a href="#" onclick="return __showPic(${JSON.stringify(p.dataURL)})" style="display:inline-block">
-           <img src="${p.dataURL}" style="width:200px;height:200px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb"/>
-         </a>`).join('')}
-     </div>` : '';
+  const section = (title, arr) => (arr && arr.length) ? `
+    <h3>${esc(title)}</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin:8px 0">
+      ${arr.map(p => `
+        <a href="#" onclick="return __showPic(${JSON.stringify(p.dataURL)})" style="display:inline-block">
+          <img src="${p.dataURL}" 
+               style="width:200px;height:200px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb"/>
+        </a>
+      `).join('')}
+    </div>` : '';
 
   const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>${esc(r.name||'阿姨')} - 档案预览</title>
+<title>${esc(r.name || '阿姨')} - 档案预览</title>
 <style>
 body{
   margin:0;
@@ -836,7 +838,6 @@ h3{margin:14px 0 8px;font-size:15px;}
   font-size:12px;
 }
 .hr{height:1px;background:#e5e7eb;margin:12px 0;}
-.footer-note{margin-top:12px;color:#9ca3af;font-size:12px;text-align:right;}
 
 /* 大图查看器 */
 #viewer{
@@ -868,29 +869,32 @@ h3{margin:14px 0 8px;font-size:15px;}
 </head><body>
 <div class="wrap">
   <div class="card">
-    <h1>${esc(r.name||'阿姨')} 档案</h1>
+    <h1>${esc(r.name || '阿姨')} 档案</h1>
 
-    <div class="row"><div class="key">年龄</div><div>${r.age?(r.age+' 岁'):''}</div></div>
+    <div class="row"><div class="key">年龄</div><div>${r.age ? (r.age + ' 岁') : ''}</div></div>
     <div class="row"><div class="key">籍贯</div><div>${esc(r.origin)}</div></div>
     <div class="row"><div class="key">联系方式</div><div>${esc(r.phone)}</div></div>
-    <div class="row"><div class="key">从业年限</div><div>${r.exp!==''?(r.exp+' 年'):''}</div></div>
+    <div class="row"><div class="key">从业年限</div><div>${r.exp !== '' ? (r.exp + ' 年') : ''}</div></div>
     <div class="row"><div class="key">住家</div><div>${esc(r.livein)}</div></div>
     <div class="row"><div class="key">属相</div><div>${esc(r.zodiac)}</div></div>
-    <div class="row"><div class="key">身高</div><div>${r.height?(r.height+' cm'):''}</div></div>
-    <div class="row"><div class="key">体重</div><div>${r.weight?(r.weight+' kg'):''}</div></div>
+    <div class="row"><div class="key">身高</div><div>${r.height ? (r.height + ' cm') : ''}</div></div>
+    <div class="row"><div class="key">体重</div><div>${r.weight ? (r.weight + ' kg') : ''}</div></div>
     <div class="row"><div class="key">学历</div><div>${esc(r.education)}</div></div>
-    <div class="row"><div class="key">可服务城市</div><div class="pills">${(r.cities||[]).map(c=>'<span>'+esc(c)+'</span>').join('')}</div></div>
+    <div class="row"><div class="key">可服务城市</div>
+      <div class="pills">${(r.cities || []).map(c => '<span>' + esc(c) + '</span>').join('')}</div>
+    </div>
     <div class="row"><div class="key">期望薪资</div><div>${esc(r.salary)}</div></div>
-    <div class="row"><div class="key">技能标签</div><div class="pills">${(r.skills||[]).map(s=>'<span>'+esc(s)+'</span>').join('')}</div></div>
+    <div class="row"><div class="key">技能标签</div>
+      <div class="pills">${(r.skills || []).map(s => '<span>' + esc(s) + '</span>').join('')}</div>
+    </div>
 
-    ${r.notes?('<div class="hr"></div><div>'+esc(r.notes)+'</div>'):''}
+    ${r.notes ? ('<div class="hr"></div><div>' + esc(r.notes) + '</div>') : ''}
 
     <div class="hr"></div>
     ${section('生活照 / 证件照', r.photos.life)}
     ${section('菜品展示', r.photos.dishes)}
     ${section('技能证书', r.photos.certs)}
     ${section('体检证明', r.photos.medical)}
-
   </div>
 </div>
 
@@ -900,27 +904,19 @@ h3{margin:14px 0 8px;font-size:15px;}
 </div>
 
 <script>
-// 点击缩略图全屏查看图片，避免新窗口 dataURL 黑屏问题
-async function __showPic(dataURL){
-  try{
-    const resp = await fetch(dataURL);
-    const blob = await resp.blob();
-    const url = URL.createObjectURL(blob);
-    const img = document.getElementById('viewerImg');
-    img.onload = ()=>{ URL.revokeObjectURL(url); };
-    img.src = url;
-  }catch(e){
-    document.getElementById('viewerImg').src = dataURL;
-  }
-  document.getElementById('viewer').style.display='flex';
-  return false;
+// 最简单、最稳的大图预览：直接用 dataURL，不再新开窗口
+function __showPic(dataURL){
+  var img = document.getElementById('viewerImg');
+  img.src = dataURL;
+  document.getElementById('viewer').style.display = 'flex';
+  return false; // 阻止 <a href="#"> 跳转
 }
 <\/script>
 </body></html>`;
 
-  const url = URL.createObjectURL(new Blob([html],{type:'text/html'}));
-  window.open(url,'_blank');
-  setTimeout(()=>URL.revokeObjectURL(url),60*1000);
+  const url = URL.createObjectURL(new Blob([html], {type:'text/html'}));
+  window.open(url, '_blank');
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 // 文本导出 / 导入
